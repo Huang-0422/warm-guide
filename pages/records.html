@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>健康档案 · 银龄指南</title>
+    
+    <!-- Supabase 数据库 SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 100;
+            text-decoration: none;
+            color: #2C3E50;
+        }
+
+        .records-container {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        .records-header {
+            background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+            border-radius: 32px;
+            padding: 28px 24px;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .records-header h1 {
+            font-size: 34px;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .records-header p {
+            font-size: 22px;
+            opacity: 0.95;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2980B9;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: #7F8C8D;
+            margin-top: 6px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .record-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .record-dept {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1A5276;
+        }
+
+        .record-date {
+            font-size: 18px;
+            color: #7F8C8D;
+        }
+
+        .record-detail {
+            display: flex;
+            gap: 20px;
+            font-size: 20px;
+            color: #5D6D7E;
+        }
+
+        .reminder-card {
+            background: #FEF9E7;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 6px solid #F1C40F;
+        }
+
+        .reminder-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #7D6608;
+            margin-bottom: 10px;
+        }
+
+        .reminder-time {
+            font-size: 28px;
+            font-weight: 700;
+            color: #E67E22;
+            margin-bottom: 10px;
+        }
+
+        .add-form {
+            background: white;
+            border-radius: 32px;
+            padding: 28px 24px;
+            margin-top: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 22px;
+            color: #5D6D7E;
+            margin-bottom: 10px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 22px;
+            border: 2px solid #D5D8DC;
+            border-radius: 60px;
+            background: #F8F9F9;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 26px;
+            background: #2980B9;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+        }
+
+        .add-btn:active {
+            background: #1A5276;
+            transform: scale(0.98);
+        }
+
+        .delete-btn {
+            background: #E74C3C;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 16px;
+            font-size: 22px;
+            text-align: center;
+            background: white;
+            border-radius: 60px;
+            cursor: pointer;
+            border: 2px solid #E5E7E9;
+        }
+
+        .tab.active {
+            background: #2980B9;
+            color: white;
+            border-color: #2980B9;
+        }
+
+        .sync-badge {
+            display: inline-block;
+            background: #27AE60;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7F8C8D;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-btn">←</a>
+
+    <div class="records-container">
+        <div class="records-header">
+            <h1>📋 我的健康档案</h1>
+            <p>就诊记录 · 用药提醒 · <span class="sync-badge">☁️ 云端同步</span></p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="visitCount">0</div>
+                <div class="stat-label">就诊次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="reminderCount">0</div>
+                <div class="stat-label">用药提醒</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="reportCount">0</div>
+                <div class="stat-label">检查报告</div>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab active" onclick="switchTab('visits')">📅 就诊记录</div>
+            <div class="tab" onclick="switchTab('reminders')">⏰ 用药提醒</div>
+        </div>
+
+        <div id="visitsTab">
+            <div class="section-title">
+                <span>📅</span>
+                <span>最近就诊</span>
+            </div>
+            <div id="visitsList">
+                <div class="empty-state">加载中...</div>
+            </div>
+        </div>
+
+        <div id="remindersTab" style="display: none;">
+            <div class="section-title">
+                <span>⏰</span>
+                <span>今日用药</span>
+            </div>
+            <div id="remindersList">
+                <div class="empty-state">加载中...</div>
+            </div>
+        </div>
+
+        <div class="add-form">
+            <div class="section-title">
+                <span>➕</span>
+                <span id="formTitle">添加就诊记录</span>
+            </div>
+            
+            <div id="visitForm">
+                <div class="form-group">
+                    <label>就诊科室</label>
+                    <input type="text" id="visitDept" placeholder="例如：心内科">
+                </div>
+                <div class="form-group">
+                    <label>就诊日期</label>
+                    <input type="date" id="visitDate">
+                </div>
+                <div class="form-group">
+                    <label>医生姓名</label>
+                    <input type="text" id="visitDoctor" placeholder="例如：张医生">
+                </div>
+                <div class="form-group">
+                    <label>诊断结果</label>
+                    <input type="text" id="visitDiagnosis" placeholder="例如：高血压">
+                </div>
+                <button class="add-btn" onclick="addVisitRecord()">💾 保存到云端</button>
+            </div>
+            
+            <div id="reminderForm" style="display: none;">
+                <div class="form-group">
+                    <label>药品名称</label>
+                    <input type="text" id="medicineName" placeholder="例如：降压药">
+                </div>
+                <div class="form-group">
+                    <label>提醒时间</label>
+                    <input type="time" id="reminderTime">
+                </div>
+                <div class="form-group">
+                    <label>剂量</label>
+                    <input type="text" id="medicineDose" placeholder="例如：1片">
+                </div>
+                <button class="add-btn" onclick="addReminder()">💾 保存到云端</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 配置区域（请修改为您的Supabase信息）=====
+        const SUPABASE_URL = 'https://你的项目ID.supabase.co';
+        const SUPABASE_KEY = '你的anon密钥';
+        // =============================================
+
+        // 全局变量（只声明一次）
+        let supabaseClient = null;
+        const currentUser = 'demo_user_001';
+        let visitRecords = [];
+        let medicineReminders = [];
+        let currentTab = 'visits';
+        let useCloud = true;
+
+        // 初始化
+        (function init() {
+            // 初始化Supabase客户端
+            if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('✅ Supabase 连接成功');
+            } else {
+                console.warn('⚠️ Supabase SDK未加载，使用本地存储');
+                useCloud = false;
+            }
+        })();
+
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', async () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('visitDate').value = today;
+            await loadData();
+            
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        });
+
+        // 加载数据
+        async function loadData() {
+            if (useCloud && supabaseClient) {
+                await loadFromCloud();
+            } else {
+                loadFromLocal();
+            }
+            renderAll();
+        }
+
+        async function loadFromCloud() {
+            try {
+                const { data: visits, error: vErr } = await supabaseClient
+                    .from('visits')
+                    .select('*')
+                    .eq('user_phone', currentUser)
+                    .order('visit_date', { ascending: false });
+                
+                if (!vErr) visitRecords = visits || [];
+
+                const { data: reminders, error: rErr } = await supabaseClient
+                    .from('reminders')
+                    .select('*')
+                    .eq('user_phone', currentUser)
+                    .eq('active', true)
+                    .order('reminder_time', { ascending: true });
+                
+                if (!rErr) medicineReminders = reminders || [];
+
+                console.log(`✅ 云端加载: ${visitRecords.length} 条记录`);
+            } catch (e) {
+                console.error('云端加载失败:', e);
+                loadFromLocal();
+            }
+        }
+
+        function loadFromLocal() {
+            const v = localStorage.getItem('visitRecords');
+            const r = localStorage.getItem('medicineReminders');
+            if (v) visitRecords = JSON.parse(v);
+            if (r) medicineReminders = JSON.parse(r);
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('visitRecords', JSON.stringify(visitRecords));
+            localStorage.setItem('medicineReminders', JSON.stringify(medicineReminders));
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('visitsTab').style.display = tab === 'visits' ? 'block' : 'none';
+            document.getElementById('remindersTab').style.display = tab === 'reminders' ? 'block' : 'none';
+            document.getElementById('visitForm').style.display = tab === 'visits' ? 'block' : 'none';
+            document.getElementById('reminderForm').style.display = tab === 'reminders' ? 'block' : 'none';
+            document.getElementById('formTitle').textContent = tab === 'visits' ? '添加就诊记录' : '添加用药提醒';
+        }
+
+        function renderAll() {
+            renderVisits();
+            renderReminders();
+            document.getElementById('visitCount').textContent = visitRecords.length;
+            document.getElementById('reminderCount').textContent = medicineReminders.length;
+            document.getElementById('reportCount').textContent = visitRecords.length;
+        }
+
+        function renderVisits() {
+            const c = document.getElementById('visitsList');
+            if (!visitRecords.length) {
+                c.innerHTML = '<div class="empty-state">📭 暂无就诊记录</div>';
+                return;
+            }
+            c.innerHTML = visitRecords.slice(0, 10).map((r, i) => `
+                <div class="record-card">
+                    <div class="record-header">
+                        <span class="record-dept">${r.dept || '未知'}</span>
+                        <span class="record-date">${r.visit_date || r.date || ''}</span>
+                    </div>
+                    <div class="record-detail">
+                        <span>👨‍⚕️ ${r.doctor || '未知'}</span>
+                        <span>📋 ${r.diagnosis || '无'}</span>
+                    </div>
+                    <div style="margin-top:12px;text-align:right;">
+                        <button class="delete-btn" onclick="deleteVisit('${r.id}',${i})">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderReminders() {
+            const c = document.getElementById('remindersList');
+            if (!medicineReminders.length) {
+                c.innerHTML = '<div class="empty-state">⏰ 暂无用药提醒</div>';
+                return;
+            }
+            c.innerHTML = medicineReminders.map((r, i) => `
+                <div class="reminder-card">
+                    <div class="reminder-title">💊 ${r.medicine_name || r.name}</div>
+                    <div class="reminder-time">⏰ ${r.reminder_time || r.time}</div>
+                    <div style="font-size:20px;color:#5D6D7E;margin-bottom:12px;">剂量：${r.dose || '按医嘱'}</div>
+                    <button class="delete-btn" onclick="deleteReminder('${r.id}',${i})">删除</button>
+                </div>
+            `).join('');
+        }
+
+        async function addVisitRecord() {
+            const dept = document.getElementById('visitDept').value.trim();
+            const date = document.getElementById('visitDate').value;
+            const doctor = document.getElementById('visitDoctor').value.trim();
+            const diagnosis = document.getElementById('visitDiagnosis').value.trim();
+
+            if (!dept || !date || !doctor) {
+                alert('请填写科室、日期、医生');
+                return;
+            }
+
+            if (useCloud && supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('visits')
+                        .insert([{ user_phone: currentUser, dept, visit_date: date, doctor, diagnosis }])
+                        .select();
+                    if (!error && data) {
+                        visitRecords.unshift(data[0]);
+                        showToast('✅ 已保存到云端');
+                    } else {
+                        throw error;
+                    }
+                } catch (e) {
+                    visitRecords.unshift({ dept, date, doctor, diagnosis, id: Date.now() });
+                    showToast('⚠️ 已保存到本地');
+                }
+            } else {
+                visitRecords.unshift({ dept, date, doctor, diagnosis, id: Date.now() });
+                showToast('✅ 已保存到本地');
+            }
+
+            saveToLocal();
+            document.getElementById('visitDept').value = '';
+            document.getElementById('visitDoctor').value = '';
+            document.getElementById('visitDiagnosis').value = '';
+            document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+            renderVisits();
+            renderAll();
+        }
+
+        async function addReminder() {
+            const name = document.getElementById('medicineName').value.trim();
+            const time = document.getElementById('reminderTime').value;
+            const dose = document.getElementById('medicineDose').value.trim();
+
+            if (!name || !time || !dose) {
+                alert('请填写完整');
+                return;
+            }
+
+            if (useCloud && supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('reminders')
+                        .insert([{ user_phone: currentUser, medicine_name: name, reminder_time: time, dose, active: true }])
+                        .select();
+                    if (!error && data) {
+                        medicineReminders.push(data[0]);
+                        showToast('✅ 已保存到云端');
+                    } else {
+                        throw error;
+                    }
+                } catch (e) {
+                    medicineReminders.push({ name, time, dose, id: Date.now() });
+                    showToast('⚠️ 已保存到本地');
+                }
+            } else {
+                medicineReminders.push({ name, time, dose, id: Date.now() });
+                showToast('✅ 已保存到本地');
+            }
+
+            saveToLocal();
+            document.getElementById('medicineName').value = '';
+            document.getElementById('reminderTime').value = '';
+            document.getElementById('medicineDose').value = '';
+            renderReminders();
+            renderAll();
+        }
+
+        async function deleteVisit(id, index) {
+            if (!confirm('确定删除？')) return;
+            if (useCloud && supabaseClient && id && !String(id).startsWith('17')) {
+                await supabaseClient.from('visits').delete().eq('id', id);
+            }
+            visitRecords.splice(index, 1);
+            saveToLocal();
+            renderVisits();
+            renderAll();
+            showToast('已删除');
+        }
+
+        async function deleteReminder(id, index) {
+            if (!confirm('确定删除？')) return;
+            if (useCloud && supabaseClient && id && !String(id).startsWith('17')) {
+                await supabaseClient.from('reminders').delete().eq('id', id);
+            }
+            medicineReminders.splice(index, 1);
+            saveToLocal();
+            renderReminders();
+            renderAll();
+            showToast('已删除');
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#2C3E50;color:white;padding:16px 32px;border-radius:60px;font-size:22px;z-index:9999;';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 2000);
+        }
+    </script>
+</body>
+</html>

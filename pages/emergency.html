@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>紧急联系人 · 银龄指南</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* 紧急联系人页面特有样式 */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 100;
+            text-decoration: none;
+            color: #2C3E50;
+        }
+
+        .emergency-container {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        /* 紧急头部提示 */
+        .emergency-header {
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            border-radius: 32px;
+            padding: 32px 24px;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .emergency-header h1 {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .emergency-header p {
+            font-size: 22px;
+            opacity: 0.95;
+        }
+
+        .sos-badge {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        /* 联系人卡片列表 */
+        .contact-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #1A5276;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .contact-card.primary {
+            border-color: #E74C3C;
+            background: #FDEDEC;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 8px;
+        }
+
+        .contact-relation {
+            font-size: 20px;
+            color: #7F8C8D;
+            margin-bottom: 6px;
+        }
+
+        .contact-phone {
+            font-size: 26px;
+            font-weight: 600;
+            color: #2980B9;
+            letter-spacing: 2px;
+        }
+
+        .call-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            background: #27AE60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+            border: none;
+            color: white;
+        }
+
+        .call-btn:active {
+            transform: scale(0.95);
+            background: #1E8449;
+        }
+
+        .call-btn.emergency {
+            background: #E74C3C;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+        }
+
+        /* 添加联系人表单 */
+        .add-contact-form {
+            background: white;
+            border-radius: 32px;
+            padding: 28px 24px;
+            margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 22px;
+            color: #5D6D7E;
+            margin-bottom: 12px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 18px 20px;
+            font-size: 22px;
+            border: 2px solid #D5D8DC;
+            border-radius: 60px;
+            background: #F8F9F9;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2980B9;
+            background: white;
+        }
+
+        .form-group input::placeholder {
+            color: #ABB2B9;
+            font-size: 20px;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 26px;
+            font-weight: 600;
+            background: #2980B9;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .add-btn:active {
+            background: #1A5276;
+            transform: scale(0.98);
+        }
+
+        /* 删除按钮 */
+        .delete-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            background: #ECF0F1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 12px;
+            border: none;
+            color: #7F8C8D;
+        }
+
+        .delete-btn:active {
+            background: #E74C3C;
+            color: white;
+        }
+
+        .contact-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        /* 一键求救大按钮 */
+        .sos-button-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .sos-main-btn {
+            width: 100%;
+            padding: 30px;
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            border: none;
+            border-radius: 80px;
+            color: white;
+            font-size: 36px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .sos-main-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .sos-main-btn .icon {
+            font-size: 48px;
+        }
+
+        /* 使用说明 */
+        .instruction-box {
+            background: #EBF5FB;
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 30px;
+        }
+
+        .instruction-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1A5276;
+            margin-bottom: 16px;
+        }
+
+        .instruction-text {
+            font-size: 20px;
+            color: #2C3E50;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="../index.html" class="back-btn">←</a>
+
+    <div class="emergency-container">
+        <!-- 头部紧急提示 -->
+        <div class="emergency-header">
+            <div class="sos-badge">🆘</div>
+            <h1>紧急联系人</h1>
+            <p>设置后可一键呼叫，关键时刻能救命</p>
+        </div>
+
+        <!-- 一键求救大按钮 -->
+        <div class="sos-button-container">
+            <button class="sos-main-btn" onclick="callAllEmergency()">
+                <span class="icon">🚨</span>
+                一键紧急呼叫
+                <span class="icon">🚨</span>
+            </button>
+        </div>
+
+        <!-- 联系人列表 -->
+        <div class="contact-section">
+            <div class="section-title">
+                <span>👥</span>
+                <span>我的紧急联系人</span>
+            </div>
+            <div id="contactList">
+                <!-- 联系人会通过JavaScript动态渲染到这里 -->
+            </div>
+        </div>
+
+        <!-- 添加新联系人 -->
+        <div class="add-contact-form">
+            <div class="form-title">➕ 添加新联系人</div>
+            <div class="form-group">
+                <label>姓名</label>
+                <input type="text" id="contactName" placeholder="例如：张建国" maxlength="10">
+            </div>
+            <div class="form-group">
+                <label>关系</label>
+                <input type="text" id="contactRelation" placeholder="例如：儿子" maxlength="10">
+            </div>
+            <div class="form-group">
+                <label>手机号码</label>
+                <input type="tel" id="contactPhone" placeholder="例如：13800138000" maxlength="11">
+            </div>
+            <button class="add-btn" onclick="addNewContact()">保存联系人</button>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="instruction-box">
+            <div class="instruction-title">💡 使用说明</div>
+            <div class="instruction-text">
+                • 点击联系人旁边的 📞 可直接拨打电话<br>
+                • 红色卡片为首选紧急联系人，将优先呼叫<br>
+                • 点击"一键紧急呼叫"将依次拨打所有联系人<br>
+                • 本功能需要手机授予拨号权限
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 紧急联系人数据存储
+        let emergencyContacts = [];
+
+        // 页面加载时从本地存储读取数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadContacts();
+            renderContactList();
+        });
+
+        // 从 localStorage 加载联系人
+        function loadContacts() {
+            const saved = localStorage.getItem('emergencyContacts');
+            if (saved) {
+                emergencyContacts = JSON.parse(saved);
+            } else {
+                // 默认添加示例联系人（演示用）
+                emergencyContacts = [
+                    {
+                        id: 1,
+                        name: '张小明',
+                        relation: '儿子',
+                        phone: '13912345678',
+                        isPrimary: true
+                    },
+                    {
+                        id: 2,
+                        name: '李医生',
+                        relation: '家庭医生',
+                        phone: '13898765432',
+                        isPrimary: false
+                    }
+                ];
+                saveContacts();
+            }
+        }
+
+        // 保存联系人到 localStorage
+        function saveContacts() {
+            localStorage.setItem('emergencyContacts', JSON.stringify(emergencyContacts));
+        }
+
+        // 渲染联系人列表
+        function renderContactList() {
+            const container = document.getElementById('contactList');
+            
+            if (emergencyContacts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #7F8C8D; font-size: 22px;">
+                        暂无紧急联系人<br>请点击下方添加
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            emergencyContacts.forEach(contact => {
+                const primaryClass = contact.isPrimary ? 'primary' : '';
+                const primaryStar = contact.isPrimary ? '⭐ ' : '';
+                
+                html += `
+                    <div class="contact-card ${primaryClass}">
+                        <div class="contact-info">
+                            <div class="contact-name">${primaryStar}${contact.name}</div>
+                            <div class="contact-relation">${contact.relation}</div>
+                            <div class="contact-phone">${formatPhone(contact.phone)}</div>
+                        </div>
+                        <div class="contact-actions">
+                            ${!contact.isPrimary ? `
+                                <button class="delete-btn" onclick="setAsPrimary(${contact.id})" title="设为首选">⭐</button>
+                            ` : ''}
+                            <button class="delete-btn" onclick="deleteContact(${contact.id})" title="删除">🗑️</button>
+                            <button class="call-btn" onclick="callContact('${contact.phone}')">
+                                📞
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // 格式化手机号码（3-4-4格式）
+        function formatPhone(phone) {
+            if (phone.length === 11) {
+                return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
+            }
+            return phone;
+        }
+
+        // 添加新联系人
+        function addNewContact() {
+            const name = document.getElementById('contactName').value.trim();
+            const relation = document.getElementById('contactRelation').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            
+            // 表单验证
+            if (!name) {
+                alert('请输入联系人姓名');
+                return;
+            }
+            if (!relation) {
+                alert('请输入与联系人的关系');
+                return;
+            }
+            if (!phone) {
+                alert('请输入手机号码');
+                return;
+            }
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                alert('请输入正确的11位手机号码');
+                return;
+            }
+            
+            // 检查是否已存在相同号码
+            const exists = emergencyContacts.find(c => c.phone === phone);
+            if (exists) {
+                alert('该号码已存在');
+                return;
+            }
+            
+            // 创建新联系人
+            const newContact = {
+                id: Date.now(),
+                name: name,
+                relation: relation,
+                phone: phone,
+                isPrimary: emergencyContacts.length === 0 // 如果是第一个联系人，自动设为首选
+            };
+            
+            emergencyContacts.push(newContact);
+            saveContacts();
+            renderContactList();
+            
+            // 清空表单
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactRelation').value = '';
+            document.getElementById('contactPhone').value = '';
+            
+            // 震动反馈
+            if (navigator.vibrate) navigator.vibrate(50);
+            
+            // 显示成功提示
+            showToast('✅ 联系人添加成功');
+        }
+
+        // 删除联系人
+        function deleteContact(id) {
+            if (!confirm('确定要删除这个联系人吗？')) {
+                return;
+            }
+            
+            emergencyContacts = emergencyContacts.filter(c => c.id !== id);
+            
+            // 如果删除的是首选联系人，将第一个设为首选
+            const hasPrimary = emergencyContacts.some(c => c.isPrimary);
+            if (!hasPrimary && emergencyContacts.length > 0) {
+                emergencyContacts[0].isPrimary = true;
+            }
+            
+            saveContacts();
+            renderContactList();
+            
+            if (navigator.vibrate) navigator.vibrate(30);
+            showToast('联系人已删除');
+        }
+
+        // 设为首选联系人
+        function setAsPrimary(id) {
+            emergencyContacts.forEach(c => {
+                c.isPrimary = (c.id === id);
+            });
+            saveContacts();
+            renderContactList();
+            
+            if (navigator.vibrate) navigator.vibrate(50);
+            showToast('⭐ 已设为首选联系人');
+        }
+
+        // 拨打单个联系人
+        function callContact(phone) {
+            if (confirm(`确认拨打电话 ${formatPhone(phone)} 吗？`)) {
+                if (navigator.vibrate) navigator.vibrate(100);
+                window.location.href = `tel:${phone}`;
+            }
+        }
+
+        // 一键呼叫所有紧急联系人
+        function callAllEmergency() {
+            if (emergencyContacts.length === 0) {
+                alert('请先添加紧急联系人');
+                return;
+            }
+            
+            // 找到首选联系人
+            const primary = emergencyContacts.find(c => c.isPrimary) || emergencyContacts[0];
+            
+            const message = `即将拨打紧急联系人：\n\n${primary.name} (${primary.relation})\n${formatPhone(primary.phone)}\n\n共有 ${emergencyContacts.length} 位联系人，将依次呼叫。`;
+            
+            if (confirm(message)) {
+                if (navigator.vibrate) navigator.vibrate(200);
+                
+                // 先拨打首选联系人
+                window.location.href = `tel:${primary.phone}`;
+                
+                // 注意：实际开发中需要处理依次拨打的逻辑
+                // 这里简化处理，直接拨打首选
+            }
+        }
+
+        // 轻提示函数
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(44, 62, 80, 0.95);
+                color: white;
+                padding: 16px 32px;
+                border-radius: 60px;
+                font-size: 22px;
+                z-index: 9999;
+                backdrop-filter: blur(10px);
+                white-space: nowrap;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

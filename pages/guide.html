@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>智能导诊 · 选科室</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* 导诊页面特有样式 */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 100;
+            text-decoration: none;
+        }
+
+        .guide-container {
+            padding-top: 60px;
+        }
+
+        .question-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 32px;
+            padding: 32px 24px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .question-box h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .question-box p {
+            font-size: 22px;
+            opacity: 0.95;
+        }
+
+        /* 人体图交互区域 */
+        .body-map {
+            background: #F0F3F4;
+            border-radius: 48px;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        .body-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #2C3E50;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .body-svg-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        /* 人体简图用CSS绘制（简化版，比赛更友好） */
+        .simple-body {
+            position: relative;
+            width: 200px;
+            height: 320px;
+            margin: 0 auto;
+        }
+
+        .body-part {
+            position: absolute;
+            background: #D5D8DC;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+
+        .body-part:hover, .body-part:active {
+            background: #85C1E9;
+            border-color: #2980B9;
+            transform: scale(1.02);
+        }
+
+        /* 头部 */
+        .part-head {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            top: 0;
+            left: 60px;
+            background: #FADBD8;
+        }
+
+        /* 胸部 */
+        .part-chest {
+            width: 110px;
+            height: 90px;
+            top: 90px;
+            left: 45px;
+            background: #D5F5E3;
+            border-radius: 30px 30px 20px 20px;
+        }
+
+        /* 腹部 */
+        .part-abdomen {
+            width: 100px;
+            height: 80px;
+            top: 190px;
+            left: 50px;
+            background: #FCF3CF;
+            border-radius: 20px 20px 30px 30px;
+        }
+
+        /* 四肢 */
+        .part-arm-left {
+            width: 30px;
+            height: 80px;
+            top: 100px;
+            left: 10px;
+            background: #E8DAEF;
+            border-radius: 30px;
+        }
+
+        .part-arm-right {
+            width: 30px;
+            height: 80px;
+            top: 100px;
+            right: 10px;
+            background: #E8DAEF;
+            border-radius: 30px;
+        }
+
+        .part-leg-left {
+            width: 35px;
+            height: 70px;
+            top: 270px;
+            left: 30px;
+            background: #D6EAF8;
+            border-radius: 20px;
+        }
+
+        .part-leg-right {
+            width: 35px;
+            height: 70px;
+            top: 270px;
+            right: 30px;
+            background: #D6EAF8;
+            border-radius: 20px;
+        }
+
+        .body-label {
+            position: absolute;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1A5276;
+            background: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            pointer-events: none;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* 结果展示区 */
+        .result-panel {
+            background: white;
+            border-radius: 32px;
+            padding: 28px 24px;
+            margin-top: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            display: none;
+        }
+
+        .result-panel.show {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+
+        .result-title {
+            font-size: 24px;
+            color: #1A5276;
+            margin-bottom: 16px;
+        }
+
+        .result-dept {
+            font-size: 36px;
+            font-weight: 700;
+            color: #E74C3C;
+            margin-bottom: 20px;
+        }
+
+        .result-desc {
+            font-size: 20px;
+            color: #5D6D7E;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 18px;
+            font-size: 22px;
+            border: none;
+            border-radius: 60px;
+            background: #F4F6F7;
+            color: #2C3E50;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #2980B9;
+            color: white;
+        }
+
+        .btn-primary:active {
+            background: #1A5276;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 常见症状快捷入口 */
+        .quick-symptoms {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .symptom-tag {
+            background: white;
+            padding: 18px;
+            border-radius: 60px;
+            font-size: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            cursor: pointer;
+            border: 1px solid #E5E7E9;
+        }
+
+        .symptom-tag:active {
+            background: #EBF5FB;
+            border-color: #2980B9;
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="../index.html" class="back-btn">←</a>
+
+    <div class="guide-container">
+        <!-- 智能问答区 -->
+        <div class="question-box">
+            <h2>🤔 哪里不舒服？</h2>
+            <p>点击下方人体图的部位，或选择常见症状</p>
+        </div>
+
+        <!-- 人体交互图 -->
+        <div class="body-map">
+            <div class="body-title">👆 点击身体部位</div>
+            <div class="simple-body">
+                <div class="body-part part-head" onclick="showDepartment('head')">
+                    <span class="body-label">头部</span>
+                </div>
+                <div class="body-part part-chest" onclick="showDepartment('chest')">
+                    <span class="body-label">胸部</span>
+                </div>
+                <div class="body-part part-abdomen" onclick="showDepartment('abdomen')">
+                    <span class="body-label">腹部</span>
+                </div>
+                <div class="body-part part-arm-left" onclick="showDepartment('arm')">
+                    <span class="body-label">手臂</span>
+                </div>
+                <div class="body-part part-arm-right" onclick="showDepartment('arm')">
+                    <span class="body-label">手臂</span>
+                </div>
+                <div class="body-part part-leg-left" onclick="showDepartment('leg')">
+                    <span class="body-label">腿部</span>
+                </div>
+                <div class="body-part part-leg-right" onclick="showDepartment('leg')">
+                    <span class="body-label">腿部</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 常见症状快捷选择 -->
+        <div class="quick-symptoms">
+            <div class="symptom-tag" onclick="showDepartment('head')">🤕 头痛头晕</div>
+            <div class="symptom-tag" onclick="showDepartment('chest')">💓 胸闷心慌</div>
+            <div class="symptom-tag" onclick="showDepartment('abdomen')">🍽️ 腹痛胃胀</div>
+            <div class="symptom-tag" onclick="showDepartment('leg')">🦵 关节疼痛</div>
+        </div>
+
+        <!-- 结果展示面板 -->
+        <div class="result-panel" id="resultPanel">
+            <div class="result-title">📋 建议就诊科室</div>
+            <div class="result-dept" id="deptName">神经内科</div>
+            <div class="result-desc" id="deptDesc">
+                头痛、头晕、失眠、记忆力减退等症状可就诊神经内科。
+            </div>
+            <div class="action-buttons">
+                <button class="btn" onclick="resetGuide()">重新选择</button>
+                <button class="btn btn-primary" onclick="simulateAppointment()">模拟挂号</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 科室数据库（简化版，实际可扩展）
+        const departmentDB = {
+            head: {
+                name: '神经内科',
+                desc: '头痛、头晕、失眠、记忆力减退、手脚麻木等。如有外伤请看神经外科。'
+            },
+            chest: {
+                name: '心内科 / 呼吸科',
+                desc: '胸闷、心慌、胸痛建议心内科；咳嗽、气喘、呼吸困难建议呼吸科。'
+            },
+            abdomen: {
+                name: '消化内科',
+                desc: '腹痛、腹胀、反酸、恶心呕吐、便秘腹泻等消化系统问题。'
+            },
+            arm: {
+                name: '骨科 / 康复科',
+                desc: '手臂疼痛、麻木、活动受限，可能是颈椎问题或关节炎。'
+            },
+            leg: {
+                name: '骨科 / 血管外科',
+                desc: '腿部疼痛、肿胀、行走困难；下肢浮肿需警惕血管问题。'
+            }
+        };
+
+        // 显示科室信息
+        function showDepartment(part) {
+            const dept = departmentDB[part];
+            if (!dept) return;
+
+            // 震动反馈（如果设备支持）
+            if (navigator.vibrate) navigator.vibrate(30);
+
+            // 更新面板内容
+            document.getElementById('deptName').textContent = dept.name;
+            document.getElementById('deptDesc').textContent = dept.desc;
+            
+            // 显示结果面板
+            const panel = document.getElementById('resultPanel');
+            panel.classList.add('show');
+
+            // 滚动到结果区域
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 重置选择
+        function resetGuide() {
+            const panel = document.getElementById('resultPanel');
+            panel.classList.remove('show');
+            
+            // 滚动回顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 模拟挂号（演示用）
+        function simulateAppointment() {
+            const deptName = document.getElementById('deptName').textContent;
+            
+            // 创建友好的大号提示
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+                display: flex; align-items: center; justify-content: center;
+                z-index: 9999;
+            `;
+            
+            const box = document.createElement('div');
+            box.style.cssText = `
+                background: white; border-radius: 48px; padding: 40px; width: 85%;
+                max-width: 450px; text-align: center;
+            `;
+            
+            box.innerHTML = `
+                <div style="font-size: 56px; margin-bottom: 24px;">✅</div>
+                <h2 style="font-size: 32px; margin-bottom: 16px; color: #1A5276;">挂号成功</h2>
+                <p style="font-size: 24px; margin-bottom: 12px;">${deptName}</p>
+                <p style="font-size: 20px; color: #5D6D7E; margin-bottom: 32px;">
+                    取号时间：今天 14:30-15:00<br>
+                    （演示模式）
+                </p>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                    style="padding: 20px; width: 100%; font-size: 26px; 
+                    background: #2980B9; color: white; border: none; 
+                    border-radius: 60px; cursor: pointer;">
+                    知道了
+                </button>
+            `;
+            
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 如果有需要可以添加一些动画效果
+            console.log('智能导诊页面已加载 - 银龄就医指南');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+/* 全局适老化重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* 柔和米白背景，护眼 */
+    background-color: #F7F6F2;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    /* 基准字号较大 */
+    font-size: 18px;
+    line-height: 1.6;
+    color: #2C3E50;
+    padding: 20px 16px 40px;
+    max-width: 500px; /* 模拟手机卡片宽度，更适合老年人视觉聚焦 */
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+/* 头部 */
+.app-header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.greeting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.wave-icon {
+    font-size: 36px;
+    animation: wave 1.5s infinite;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: 600;
+    color: #1A5276;
+    letter-spacing: 1px;
+}
+
+.sub-text {
+    font-size: 20px;
+    color: #5D6D7E;
+    margin-top: 8px;
+    font-weight: 400;
+}
+
+/* 大卡片网格 */
+.main-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 卡片设计：高对比度、大圆角、大阴影 */
+.card {
+    background: #FFFFFF;
+    border-radius: 32px;
+    padding: 28px 24px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    /* 防止文本被选中 */
+    user-select: none;
+}
+
+/* 点击反馈（对老年人很重要，让他们知道点到了） */
+.card:active {
+    transform: scale(0.98);
+    background-color: #F4F6F7;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.card h2 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1A252F;
+    margin-bottom: 12px;
+}
+
+.card-desc {
+    font-size: 20px;
+    color: #566573;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.card-action {
+    font-size: 22px;
+    font-weight: 500;
+    color: #2980B9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 紧急卡片特殊配色 */
+.card-emergency {
+    background: #FDEDEC;
+    border: 2px solid #E74C3C;
+}
+
+.card-emergency h2 {
+    color: #922B21;
+}
+
+.emergency-action {
+    color: #E74C3C;
+    font-weight: 700;
+}
+
+/* 底部信息 */
+.info-footer {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 48px;
+    backdrop-filter: blur(5px);
+    text-align: center;
+}
+
+.weather-tip {
+    font-size: 20px;
+    color: #1C2833;
+}
+
+/* 简单动画 */
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(20deg); }
+    75% { transform: rotate(-15deg); }
+}
+
+/* 适老化按钮最小尺寸保障 (所有可点击元素) */
+.card, button {
+    min-height: 44px;
+}

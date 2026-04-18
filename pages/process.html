@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>就医流程 · 银龄指南</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* 流程页面特有样式 */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 100;
+            text-decoration: none;
+            color: #2C3E50;
+        }
+
+        .process-container {
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        /* 头部说明 */
+        .process-header {
+            background: linear-gradient(135deg, #1ABC9C 0%, #16A085 100%);
+            border-radius: 32px;
+            padding: 32px 24px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .process-header h1 {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .process-header p {
+            font-size: 22px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        /* 流程步骤 - 时间线设计 */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 10px;
+            bottom: 10px;
+            width: 4px;
+            background: linear-gradient(to bottom, #1ABC9C, #3498DB, #9B59B6, #E67E22, #E74C3C);
+            border-radius: 2px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            position: relative;
+            border: 1px solid #E8F6F3;
+        }
+
+        .step-number {
+            position: absolute;
+            left: -52px;
+            top: 28px;
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 3px solid white;
+        }
+
+        .step-1 .step-number { background: #1ABC9C; }
+        .step-2 .step-number { background: #3498DB; }
+        .step-3 .step-number { background: #9B59B6; }
+        .step-4 .step-number { background: #E67E22; }
+        .step-5 .step-number { background: #E74C3C; }
+
+        .step-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .step-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2C3E50;
+            margin-bottom: 16px;
+        }
+
+        .step-content {
+            font-size: 20px;
+            color: #5D6D7E;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .step-tip {
+            background: #FEF9E7;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 20px;
+            color: #7D6608;
+            border-left: 4px solid #F1C40F;
+        }
+
+        .step-tip.warning {
+            background: #FDEDEC;
+            color: #922B21;
+            border-left-color: #E74C3C;
+        }
+
+        .step-tip.success {
+            background: #E8F8F5;
+            color: #0E6655;
+            border-left-color: #1ABC9C;
+        }
+
+        /* 必备物品清单 */
+        .checklist-section {
+            margin-top: 40px;
+            background: white;
+            border-radius: 32px;
+            padding: 28px 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .checklist-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #1A5276;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .checklist-item {
+            background: #F8F9F9;
+            border-radius: 60px;
+            padding: 16px 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .checklist-item.checked {
+            background: #D5F5E3;
+            border-color: #27AE60;
+        }
+
+        .checklist-item .checkbox {
+            width: 28px;
+            height: 28px;
+            border-radius: 14px;
+            border: 3px solid #BDC3C7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: #27AE60;
+            border-color: #27AE60;
+        }
+
+        /* 快速导航 */
+        .quick-nav {
+            display: flex;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 60px;
+            font-size: 22px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            cursor: pointer;
+            border: 2px solid #E5E7E9;
+            transition: all 0.2s;
+            color: #2C3E50;
+            text-decoration: none;
+        }
+
+        .nav-btn:active {
+            background: #EBF5FB;
+            border-color: #2980B9;
+        }
+
+        .nav-btn.primary {
+            background: #2980B9;
+            color: white;
+            border-color: #2980B9;
+        }
+
+        /* 语音播报按钮 */
+        .voice-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            background: #1ABC9C;
+            box-shadow: 0 8px 20px rgba(26, 188, 156, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            z-index: 99;
+        }
+
+        .voice-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="../index.html" class="back-btn">←</a>
+
+    <div class="process-container">
+        <!-- 头部说明 -->
+        <div class="process-header">
+            <h1>🏥 就医全流程指引</h1>
+            <p>从出门到回家，每一步都有详细说明。点击步骤可听语音播报。</p>
+        </div>
+
+        <!-- 时间线流程 -->
+        <div class="timeline">
+            <!-- 步骤1：就诊前准备 -->
+            <div class="step-card step-1" onclick="speakStep(1)">
+                <div class="step-number">1</div>
+                <div class="step-icon">📋</div>
+                <div class="step-title">就诊前准备</div>
+                <div class="step-content">
+                    提前预约挂号，准备好医保卡、身份证、既往病历资料。
+                </div>
+                <div class="step-tip success">
+                    💡 建议：提前一天整理好所有证件，放在固定的袋子里。
+                </div>
+            </div>
+
+            <!-- 步骤2：到达医院 -->
+            <div class="step-card step-2" onclick="speakStep(2)">
+                <div class="step-number">2</div>
+                <div class="step-icon">🚗</div>
+                <div class="step-title">到达医院</div>
+                <div class="step-content">
+                    根据预约时间提前30分钟到达，找到对应科室楼层。
+                </div>
+                <div class="step-tip">
+                    💡 建议：医院大厅都有导诊台，可以直接问工作人员。
+                </div>
+            </div>
+
+            <!-- 步骤3：签到候诊 -->
+            <div class="step-card step-3" onclick="speakStep(3)">
+                <div class="step-number">3</div>
+                <div class="step-icon">📱</div>
+                <div class="step-title">签到候诊</div>
+                <div class="step-content">
+                    在自助机或分诊台签到，领取排队号码。注意听叫号或看大屏幕。
+                </div>
+                <div class="step-tip warning">
+                    ⚠️ 注意：过号需要重新签到，请勿远离候诊区。
+                </div>
+            </div>
+
+            <!-- 步骤4：医生就诊 -->
+            <div class="step-card step-4" onclick="speakStep(4)">
+                <div class="step-number">4</div>
+                <div class="step-icon">👨‍⚕️</div>
+                <div class="step-title">医生就诊</div>
+                <div class="step-content">
+                    详细描述病情，告知医生正在服用的药物。记住医生的嘱咐。
+                </div>
+                <div class="step-tip">
+                    💡 建议：可以提前把小本子上记下想问的问题，避免忘记。
+                </div>
+            </div>
+
+            <!-- 步骤5：缴费取药 -->
+            <div class="step-card step-5" onclick="speakStep(5)">
+                <div class="step-number">5</div>
+                <div class="step-icon">💊</div>
+                <div class="step-title">缴费取药</div>
+                <div class="step-content">
+                    凭处方单到收费窗口或自助机缴费，然后到药房取药。
+                </div>
+                <div class="step-tip warning">
+                    ⚠️ 注意：核对药品名称和数量，询问药师用药方法。
+                </div>
+            </div>
+        </div>
+
+        <!-- 必备物品清单 -->
+        <div class="checklist-section">
+            <div class="checklist-title">
+                <span>🎒</span>
+                <span>出门必备清单（点击勾选）</span>
+            </div>
+            <div class="checklist-grid" id="checklist">
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <span class="checkbox">✓</span>
+                    <span>医保卡</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <span class="checkbox">✓</span>
+                    <span>身份证</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <span class="checkbox">✓</span>
+                    <span>病历本</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <span class="checkbox">✓</span>
+                    <span>既往检查单</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <span class="checkbox">✓</span>
+                    <span>常用药清单</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <span class="checkbox">✓</span>
+                    <span>水杯</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快速导航 -->
+        <div class="quick-nav">
+            <a href="guide.html" class="nav-btn">🩺 智能导诊</a>
+            <a href="emergency.html" class="nav-btn primary">🆘 紧急呼叫</a>
+        </div>
+    </div>
+
+    <!-- 语音播报按钮 -->
+    <button class="voice-btn" onclick="speakAllSteps()" title="点击播报全部流程">🔊</button>
+
+    <script>
+        // 流程步骤文本（用于语音播报）
+        const stepTexts = {
+            1: '第一步，就诊前准备。提前预约挂号，准备好医保卡、身份证、既往病历资料。建议提前一天整理好所有证件，放在固定的袋子里。',
+            2: '第二步，到达医院。根据预约时间提前30分钟到达，找到对应科室楼层。医院大厅都有导诊台，可以直接问工作人员。',
+            3: '第三步，签到候诊。在自助机或分诊台签到，领取排队号码。注意听叫号或看大屏幕。过号需要重新签到，请勿远离候诊区。',
+            4: '第四步，医生就诊。详细描述病情，告知医生正在服用的药物。记住医生的嘱咐。可以提前把小本子上记下想问的问题，避免忘记。',
+            5: '第五步，缴费取药。凭处方单到收费窗口或自助机缴费，然后到药房取药。核对药品名称和数量，询问药师用药方法。'
+        };
+
+        // 勾选清单项
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            
+            // 震动反馈
+            if (navigator.vibrate) navigator.vibrate(20);
+            
+            // 保存勾选状态到本地存储
+            saveChecklistState();
+        }
+
+        // 保存清单状态
+        function saveChecklistState() {
+            const items = document.querySelectorAll('.checklist-item');
+            const state = [];
+            items.forEach((item, index) => {
+                state.push(item.classList.contains('checked'));
+            });
+            localStorage.setItem('checklistState', JSON.stringify(state));
+        }
+
+        // 加载清单状态
+        function loadChecklistState() {
+            const saved = localStorage.getItem('checklistState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                const items = document.querySelectorAll('.checklist-item');
+                items.forEach((item, index) => {
+                    if (state[index]) {
+                        item.classList.add('checked');
+                    }
+                });
+            }
+        }
+
+        // 语音播报单个步骤
+        function speakStep(stepNum) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(stepTexts[stepNum]);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.9; // 语速稍慢，适合老年人
+                utterance.pitch = 1.0;
+                
+                // 取消当前正在播放的语音
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+                
+                // 震动反馈
+                if (navigator.vibrate) navigator.vibrate(30);
+            } else {
+                alert('您的浏览器不支持语音播报功能');
+            }
+        }
+
+        // 语音播报全部步骤
+        function speakAllSteps() {
+            if ('speechSynthesis' in window) {
+                // 组合全部文本
+                let fullText = '就医全流程指引。';
+                for (let i = 1; i <= 5; i++) {
+                    fullText += stepTexts[i] + '。';
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(fullText);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.85;
+                utterance.pitch = 1.0;
+                
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+                
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+                // 显示提示
+                showToast('🔊 正在播报就医流程...');
+            } else {
+                alert('您的浏览器不支持语音播报功能');
+            }
+        }
+
+        // 轻提示
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 120px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(44, 62, 80, 0.95);
+                color: white;
+                padding: 16px 32px;
+                border-radius: 60px;
+                font-size: 22px;
+                z-index: 9999;
+                backdrop-filter: blur(10px);
+                white-space: nowrap;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChecklistState();
+            
+            // 检查浏览器是否支持语音
+            if (!('speechSynthesis' in window)) {
+                console.log('当前浏览器不支持语音播报');
+            }
+        });
+
+        // 页面离开时停止语音
+        window.addEventListener('beforeunload', function() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        });
+    </script>
+</body>
+</html>

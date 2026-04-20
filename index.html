@@ -1,269 +1,792 @@
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 禁止用户缩放，防止误触变大页面布局错乱，同时允许系统大字体 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>银龄就医 · 随身指南</title>
-    
-    <!-- Supabase 数据库 SDK -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>银龄就医·随身指南 | 智慧助老</title>
+    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* 首页特有样式补充 */
-        .main-grid {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(145deg, #e9f0f5 0%, #d9e2ec 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            gap: 24px;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* 院内导航卡片特殊渐变背景 */
-        .card-navigation {
-            background: linear-gradient(135deg, #E8F8F5 0%, #D1F2EB 100%);
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        /* 健康档案卡片特殊渐变背景 */
-        .card-records {
-            background: linear-gradient(135deg, #EBF5FB 0%, #D6EAF8 100%);
+        /* 卡片样式 */
+        .login-card, .main-card, .register-card {
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 48px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            padding: 32px 24px 40px;
+            transition: all 0.3s;
+        }
+        .main-card {
+            padding: 28px 24px 36px;
+        }
+        .app-title {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .app-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e4a6e;
+            background: linear-gradient(135deg, #1e4a6e, #2c7da0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .app-title p {
+            font-size: 14px;
+            color: #5e7e9a;
+            margin-top: 6px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 18px;
+            font-weight: 500;
+            color: #1f4e6e;
+            margin-bottom: 8px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 16px 18px;
+            font-size: 18px;
+            border: 2px solid #cbdde9;
+            border-radius: 60px;
+            background: #ffffff;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44, 125, 160, 0.2);
+        }
+        .btn-primary {
+            width: 100%;
+            background: #2c7da0;
+            border: none;
+            padding: 16px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            border-radius: 60px;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+            background: #1f5e7e;
+        }
+        .btn-secondary {
+            background: #b0c4d9;
+            color: #1f4e6e;
+            margin-top: 12px;
+        }
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #2c7da0;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .error-msg {
+            background: #ffe8e6;
+            padding: 10px;
+            border-radius: 40px;
+            color: #c7362b;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .success-msg {
+            background: #e0f7e8;
+            padding: 10px;
+            border-radius: 40px;
+            color: #1e7b48;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .greeting-area {
+            background: #eef4fa;
+            border-radius: 44px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 28px;
+            box-shadow: inset 0 1px 2px #ffffff80, 0 6px 12px -8px rgba(0,0,0,0.1);
+        }
+        .greeting-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a4c6e;
+        }
+        .greeting-sub {
+            font-size: 18px;
+            color: #4c6f8c;
+            margin-top: 8px;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 40px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 18px -8px rgba(0,0,0,0.08);
+            border: 1px solid #e2edf2;
+            transition: all 0.2s;
+        }
+        .feature-card:active {
+            transform: scale(0.99);
+        }
+        .feature-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e4a6e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-desc {
+            font-size: 17px;
+            color: #4b6f8a;
+            margin: 12px 0 20px;
+            line-height: 1.4;
+        }
+        .big-btn {
+            background: #2c7da0;
+            padding: 16px 20px;
+            border-radius: 60px;
+            width: 100%;
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .big-btn:active {
+            transform: scale(0.98);
+            background: #1f5e7e;
+        }
+        .logout-btn {
+            background: #d9e2ec;
+            color: #2c5a7a;
+            margin-bottom: 16px;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .logout-btn:active {
+            background: #c0d0e0;
+        }
+        .reminder-bar {
+            background: #fef6e0;
+            border-radius: 32px;
+            padding: 14px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #b1620e;
+            border-left: 5px solid #f4b942;
+        }
+        .modal-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-mask.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 520px;
+            border-radius: 56px;
+            padding: 28px 20px 32px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 30px 40px rgba(0,0,0,0.3);
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 32px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #7f9cbb;
+            font-weight: bold;
+        }
+        .body-parts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .part-btn {
+            background: #eef2f7;
+            border: none;
+            padding: 14px 8px;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #1f4e6e;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .part-btn:active {
+            background: #cfe1ec;
+            transform: scale(0.97);
+        }
+        .dept-result {
+            background: #e5f3fa;
+            border-radius: 32px;
+            padding: 18px;
+            text-align: center;
+            font-size: 17px;
+            color: #155f7c;
+        }
+        .step-item {
+            background: #f8fafd;
+            margin: 14px 0;
+            padding: 14px 18px;
+            border-radius: 36px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1f4e6e;
+            border-left: 6px solid #2c7da0;
+        }
+        .reminder-item {
+            background: #f3f9fc;
+            border-radius: 28px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .add-reminder {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .add-reminder input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            border: 1px solid #cbdde9;
+            font-size: 16px;
+        }
+        .small-btn {
+            background: #2c7da0;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .footer-info {
+            text-align: center;
+            color: #6c8eaa;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        hr {
+            margin: 16px 0;
+            border-color: #cfe1ec;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #2c7da0;
+        }
+        @media (max-width: 480px) {
+            .feature-title { font-size: 22px; }
+            .greeting-text { font-size: 24px; }
+            body { padding: 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- 适老化头部：大号欢迎语 -->
-    <header class="app-header">
-        <div class="greeting">
-            <span class="wave-icon">👋</span>
-            <h1 id="timeGreeting">健康相伴</h1>
+<div class="container" id="app">
+    <!-- 登录界面（默认显示） -->
+    <div id="loginContainer" class="login-card">
+        <div class="app-title">
+            <h1>🏥 银龄就医·随身指南</h1>
+            <p>长辈友好 · 数据云端同步</p>
         </div>
-        <p class="sub-text">有问题，点大按钮，不着急</p>
-    </header>
+        <div class="input-group">
+            <label>📧 电子邮箱</label>
+            <input type="email" id="loginEmail" placeholder="请输入注册邮箱" autocomplete="off">
+        </div>
+        <div class="input-group">
+            <label>🔐 密码</label>
+            <input type="password" id="loginPassword" placeholder="请输入密码" autocomplete="off">
+        </div>
+        <button class="btn-primary" id="doLoginBtn">登录 →</button>
+        <div class="toggle-link" id="showRegisterBtn">📝 还没有账号？点击注册</div>
+        <div id="loginError" class="error-msg" style="display:none;"></div>
+        <div class="footer-info">🔒 数据加密存储 · Supabase 云端同步</div>
+    </div>
 
-    <!-- 核心功能区：五个大卡片 -->
-    <main class="main-grid">
-        <!-- 卡片1：智能导诊 -->
-        <div class="card card-primary" onclick="window.location.href='pages/guide.html'">
-            <div class="card-icon">🩺</div>
-            <h2>不知道挂哪科？</h2>
-            <p class="card-desc">点这里，按部位选科室，简单准确</p>
-            <div class="card-action">去查询 →</div>
+    <!-- 注册界面（默认隐藏） -->
+    <div id="registerContainer" class="register-card" style="display:none;">
+        <div class="app-title">
+            <h1>📝 注册新账号</h1>
+            <p>简单几步，开启智慧就医</p>
         </div>
+        <div class="input-group">
+            <label>📧 电子邮箱</label>
+            <input type="email" id="regEmail" placeholder="用于登录和找回密码">
+        </div>
+        <div class="input-group">
+            <label>🔐 密码</label>
+            <input type="password" id="regPassword" placeholder="至少6位，建议包含字母和数字">
+        </div>
+        <div class="input-group">
+            <label>👤 昵称</label>
+            <input type="text" id="regName" placeholder="怎么称呼您？（如：李爷爷）">
+        </div>
+        <button class="btn-primary" id="doRegisterBtn">注册并登录 →</button>
+        <div class="toggle-link" id="backToLoginBtn">← 返回登录</div>
+        <div id="regError" class="error-msg" style="display:none;"></div>
+    </div>
 
-        <!-- 卡片2：看病流程指南 -->
-        <div class="card card-secondary" onclick="window.location.href='pages/process.html'">
-            <div class="card-icon">🏥</div>
-            <h2>挂号·签到·取药</h2>
-            <p class="card-desc">医院看病全流程指引，每一步都清楚</p>
-            <div class="card-action">查看流程 →</div>
-        </div>
+    <!-- 主界面（登录后显示） -->
+    <div id="mainContainer" style="display:none;">
+        <div class="main-card">
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="logout-btn" id="logoutMainBtn">🚪 退出账号</button>
+            </div>
+            <div class="greeting-area">
+                <div class="greeting-text" id="greetingText">加载中...</div>
+                <div class="greeting-sub" id="greetingSub">有问题，点大按钮，不着急 ✨</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-title">🔍 不知道挂哪科？</div>
+                <div class="feature-desc">按部位选科室，简单准确，避免挂错号。</div>
+                <button class="big-btn" id="openDeptModalBtn">去查询 →</button>
+            </div>
 
-        <!-- 卡片3：院内实时导航 -->
-        <div class="card card-navigation" onclick="window.location.href='pages/navigation.html'">
-            <div class="card-icon">🗺️</div>
-            <h2>院内实时导航</h2>
-            <p class="card-desc">楼层地图+语音指引，轻松找到科室</p>
-            <div class="card-action">开始导航 →</div>
-        </div>
+            <div class="feature-card">
+                <div class="feature-title">📋 挂号·签到·取药</div>
+                <div class="feature-desc">医院看病全流程指引，每一步都清楚。</div>
+                <button class="big-btn" id="openFlowModalBtn">查看流程 →</button>
+            </div>
 
-        <!-- 卡片4：紧急呼叫 -->
-        <div class="card card-emergency" onclick="triggerEmergency()">
-            <div class="card-icon">🆘</div>
-            <h2>紧急情况</h2>
-            <p class="card-desc">一键拨打120 / 子女电话</p>
-            <div class="card-action emergency-action">立即呼叫 →</div>
-        </div>
+            <div class="feature-card">
+                <div class="feature-title">🗺️ 院内实时导航</div>
+                <div class="feature-desc">楼层地图+语音指引，轻松找到科室。</div>
+                <button class="big-btn" id="openNavModalBtn">开始导航 →</button>
+            </div>
 
-        <!-- 卡片5：健康档案（新增） -->
-        <div class="card card-records" onclick="window.location.href='pages/records.html'">
-            <div class="card-icon">📋</div>
-            <h2>我的健康档案</h2>
-            <p class="card-desc">就诊记录、用药提醒、云端同步</p>
-            <div class="card-action">查看记录 →</div>
-        </div>
-    </main>
+            <div class="feature-card">
+                <div class="feature-title">🚨 SOS 紧急情况</div>
+                <div class="feature-desc">一键拨打120 / 子女电话，守护安全。</div>
+                <button class="big-btn" id="openSOSModalBtn" style="background:#c7452e;">立即呼叫 →</button>
+            </div>
 
-    <!-- 底部常用信息：显示大字体时间与天气提醒 -->
-    <footer class="info-footer">
-        <div class="weather-tip">
-            <span>🌡️ 今日提醒：</span>
-            <span id="healthTip">天气转凉，就诊记得带件外套</span>
+            <div class="feature-card">
+                <div class="feature-title">📁 我的健康档案</div>
+                <div class="feature-desc">就诊记录、用药提醒、云端同步。</div>
+                <button class="big-btn" id="openHealthModalBtn">查看记录 →</button>
+            </div>
+
+            <div class="reminder-bar">
+                🌤️ 今日提醒：天气转凉，就诊记得带件外套<br>
+                🏥 门诊时间 8:00-17:00 | 📞 咨询 12320
+            </div>
+            <div class="footer-info">❤️ 数据已加密，仅您可见 | 银龄无忧</div>
         </div>
-        <div class="footer-links" style="margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
-            <span style="font-size: 18px; color: #7F8C8D;">🏥 门诊时间 8:00-17:00</span>
-            <span style="font-size: 18px; color: #7F8C8D;">📞 咨询 12320</span>
+    </div>
+</div>
+
+<!-- 模态框们 -->
+<div id="deptModal" class="modal-mask">
+    <div class="modal-container">
+        <button class="modal-close" id="closeDeptModalBtn">✕</button>
+        <h3>📌 按部位选择科室</h3>
+        <div class="body-parts-grid" id="bodyPartsGrid"></div>
+        <div id="deptSuggestion" class="dept-result">👆 点击上方部位，显示建议科室</div>
+    </div>
+</div>
+
+<div id="flowModal" class="modal-mask">
+    <div class="modal-container">
+        <button class="modal-close" id="closeFlowModalBtn">✕</button>
+        <h3>🏥 看病流程全知道</h3>
+        <div class="steps-list">
+            <div class="step-item">1️⃣ 挂号 · 线上/现场挂号，带好医保卡</div>
+            <div class="step-item">2️⃣ 签到 · 到诊区自助机或分诊台签到</div>
+            <div class="step-item">3️⃣ 候诊 · 留意叫号屏幕，耐心等待</div>
+            <div class="step-item">4️⃣ 就诊 · 向医生说明症状，别紧张</div>
+            <div class="step-item">5️⃣ 缴费 · 窗口/手机支付，保留发票</div>
+            <div class="step-item">6️⃣ 取药 · 药房扫码取药，核对药品</div>
         </div>
-    </footer>
+        <div class="dept-result" style="margin-top:16px;">💡 小提示：如有疑问，随时咨询导诊台</div>
+    </div>
+</div>
+
+<div id="navModal" class="modal-mask">
+    <div class="modal-container">
+        <button class="modal-close" id="closeNavModalBtn">✕</button>
+        <h3>🗺️ 楼层指引 & 语音模拟</h3>
+        <div class="steps-list">
+            <div class="step-item">📍 1F：挂号收费处 / 西药房 / 导诊台</div>
+            <div class="step-item">📍 2F：内科门诊 / 外科门诊 / 抽血室</div>
+            <div class="step-item">📍 3F：眼科/耳鼻喉科 / 超声科</div>
+            <div class="step-item">📍 4F：检验科 / 心电图室</div>
+            <div class="step-item">📍 5F：中医科 / 康复理疗科</div>
+        </div>
+        <button id="simulateVoiceBtn" class="big-btn" style="background:#5f9db2; margin-top:12px;">🔊 播放导航提示 (模拟语音)</button>
+    </div>
+</div>
+
+<div id="sosModal" class="modal-mask">
+    <div class="modal-container">
+        <button class="modal-close" id="closeSOSModalBtn">✕</button>
+        <h3>🚨 紧急求助</h3>
+        <button id="call120Btn" class="big-btn" style="background:#c7452e; margin-bottom:12px;">📞 拨打 120 急救</button>
+        <button id="callChildBtn" class="big-btn" style="background:#4f7ea0;">📞 拨打子女电话</button>
+        <div style="margin-top:20px; text-align:center; background:#eef2f7; padding:12px; border-radius:40px;">
+            📱 子女号码：<strong id="childPhoneDisplay">未设置</strong>
+            <button id="editChildPhoneBtn" style="background:#b0c4d9; border:none; border-radius:30px; padding:8px 16px; margin-left:10px;">修改号码</button>
+        </div>
+        <div class="dept-result" style="margin-top:16px;">⚠️ 按下即拨出，请确认紧急情况后使用</div>
+    </div>
+</div>
+
+<div id="healthModal" class="modal-mask">
+    <div class="modal-container">
+        <button class="modal-close" id="closeHealthModalBtn">✕</button>
+        <h3>📋 我的健康档案</h3>
+        <div><strong>🏥 近期就诊记录</strong></div>
+        <div id="visitRecordsList" class="steps-list" style="margin-top:0;"></div>
+        <hr>
+        <div><strong>💊 用药提醒</strong> <span style="font-size:14px;">(云端同步 ✓)</span></div>
+        <div id="remindersList"></div>
+        <div class="add-reminder">
+            <input type="text" id="newReminderInput" placeholder="例如: 晚上8点吃降压药">
+            <button id="addReminderBtn" class="small-btn">添加提醒</button>
+        </div>
+        <div class="dept-result" style="margin-top:18px;">☁️ 健康档案已云端备份，就诊记录自动同步</div>
+    </div>
+</div>
+
 <script>
-    // ============================================
-    // 动态天气健康提醒模块
-    // ============================================
-    
-    // 1. 配置高德 API 密钥 (请替换为你申请的真实 Key)
-    const GAODE_API_KEY = '8390a84c84dc287c3f757a7cc30ed0f9';
-    
-    // 2. 默认城市编码 (110000 为北京，可按需修改)
-    const DEFAULT_CITY_CODE = '110000';
-    
-    // 3. 获取页面元素
-    const healthTipElement = document.getElementById('healthTip');
-    
-    // 4. 核心函数：获取天气并更新提醒
-    async function fetchWeatherAndUpdateTip() {
-        if (!healthTipElement) return;
-        
-        try {
-            // 尝试获取用户地理位置
-            const position = await getUserLocation();
-            const { longitude, latitude } = position.coords;
-            
-            // 根据经纬度获取城市编码
-            const cityCode = await getCityCodeByLocation(longitude, latitude);
-            
-            // 获取天气并生成提醒
-            await updateWeatherTip(cityCode);
-            
-        } catch (error) {
-            console.warn('定位或天气获取失败，使用默认城市:', error);
-            // 定位失败，降级使用默认城市
-            await updateWeatherTip(DEFAULT_CITY_CODE);
+    // ================= 请替换为您的 Supabase 配置 =================
+ // 替换这里
+    const SUPABASE_URL = 'https://ddurkjatbkykogkurcyu.supabase.co';  // 替换这里
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkdXJramF0Ymt5a29na3VyY3l1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMzEwNDksImV4cCI6MjA5MTkwNzA0OX0.pDFHzoRzoTyP3fcQIMwZuVpriSxjMPWNAbhYuImUnDs';                    // 替换这里
+
+    // =============================================================
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentUser = null;
+
+    // 部位科室映射
+    const deptMap = new Map([
+        ["头部 (头痛/眩晕/失眠)", "🏥 神经内科 / 老年科"],
+        ["眼部 (视物模糊/红肿)", "👁️ 眼科"],
+        ["耳鼻喉 (耳鸣/咽痛/鼻炎)", "👂 耳鼻喉科"],
+        ["口腔 (牙痛/溃疡)", "🦷 口腔科"],
+        ["颈部 (甲状腺/颈痛)", "🦴 甲状腺科 / 骨科"],
+        ["胸部 (胸闷/咳嗽/心慌)", "❤️ 心内科 / 呼吸内科"],
+        ["腹部 (胃痛/腹痛/腹泻)", "🍽️ 消化内科 / 普外科"],
+        ["腰背部 (腰痛/僵硬)", "🦵 骨科 / 康复科"],
+        ["四肢关节 (膝盖/肩膀痛)", "🦴 骨科 / 风湿免疫科"],
+        ["皮肤 (皮疹/瘙痒/肿物)", "🧴 皮肤科"],
+        ["泌尿/生殖 (排尿异常)", "🚽 泌尿外科 / 肾内科"],
+        ["全身乏力/发热", "🌡️ 全科 / 发热门诊"]
+    ]);
+
+    function buildDeptButtons() {
+        const grid = document.getElementById("bodyPartsGrid");
+        if(!grid) return;
+        grid.innerHTML = "";
+        for(let [part, dept] of deptMap) {
+            const btn = document.createElement("button");
+            btn.className = "part-btn";
+            btn.textContent = part;
+            btn.onclick = () => {
+                const resDiv = document.getElementById("deptSuggestion");
+                resDiv.innerHTML = `✅ 建议挂号：${dept}<br>✨ 可先挂该科室，医生会根据情况分诊`;
+                resDiv.style.background = "#d9f0f7";
+            };
+            grid.appendChild(btn);
         }
     }
-    
-    // 5. 获取用户地理位置 (返回 Promise)
-    function getUserLocation() {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject(new Error('浏览器不支持定位'));
+
+    function showModal(id) { document.getElementById(id).classList.add('active'); }
+    function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function updateGreeting() {
+        const hour = new Date().getHours();
+        let greet = "", sub = "";
+        if (hour >= 5 && hour < 9) { greet = "🌅 早上好，活力满满"; sub = "开启健康的一天，从容就医"; }
+        else if (hour >= 9 && hour < 12) { greet = "☀️ 上午好，精神爽朗"; sub = "有问题点大按钮，不着急"; }
+        else if (hour >= 12 && hour < 14) { greet = "🍜 中午好，记得休息"; sub = "身体最重要，慢慢来"; }
+        else if (hour >= 14 && hour < 18) { greet = "📖 下午好，保持轻松"; sub = "指南在手，看病不愁"; }
+        else if (hour >= 18 && hour < 22) { greet = "🌙 晚上好，早点休息"; sub = "有问题，点大按钮，不着急"; }
+        else { greet = "🌙 夜深了，好好休息"; sub = "明天再处理，保重身体"; }
+        document.getElementById("greetingText").innerText = greet;
+        document.getElementById("greetingSub").innerHTML = sub;
+    }
+
+    // 加载用户数据
+    async function loadUserData() {
+        if(!currentUser) return;
+        const userId = currentUser.id;
+        
+        // 就诊记录
+        const { data: visits } = await supabase
+            .from('visit_records')
+            .select('*')
+            .eq('user_id', userId)
+            .order('visit_date', { ascending: false });
+        const visitsContainer = document.getElementById('visitRecordsList');
+        if(visits && visits.length > 0) {
+            visitsContainer.innerHTML = visits.map(v => `<div class="step-item">📅 ${v.visit_date || '未知日期'} | ${v.department || '科室'} | ${v.diagnosis || '复诊'}</div>`).join('');
+        } else {
+            visitsContainer.innerHTML = '<div class="step-item">暂无就诊记录，就诊后会自动同步</div>';
+        }
+
+        // 用药提醒
+        const { data: reminders } = await supabase
+            .from('reminders')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
+        const remindersContainer = document.getElementById('remindersList');
+        if(reminders && reminders.length > 0) {
+            remindersContainer.innerHTML = reminders.map(r => `
+                <div class="reminder-item">
+                    <span>💊 ${r.content}</span>
+                    <button class="del-reminder" data-id="${r.id}" style="background:#dcb9a8; border:none; border-radius:30px; padding:6px 12px;">删除</button>
+                </div>
+            `).join('');
+            document.querySelectorAll('.del-reminder').forEach(btn => {
+                btn.onclick = async () => {
+                    await supabase.from('reminders').delete().eq('id', btn.getAttribute('data-id'));
+                    loadUserData();
+                };
+            });
+        } else {
+            remindersContainer.innerHTML = '<div>暂无提醒，点击上方添加</div>';
+        }
+
+        // 子女电话
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('child_phone')
+            .eq('user_id', userId)
+            .maybeSingle();
+        const childPhone = profile?.child_phone || '未设置';
+        document.getElementById('childPhoneDisplay').innerText = childPhone;
+        window.currentChildPhone = childPhone;
+    }
+
+    async function addReminder(content) {
+        if(!currentUser) return;
+        await supabase.from('reminders').insert({ user_id: currentUser.id, content: content });
+        loadUserData();
+    }
+
+    async function updateChildPhone(phone) {
+        if(!currentUser) return;
+        await supabase.from('user_profiles').upsert({ user_id: currentUser.id, child_phone: phone }, { onConflict: 'user_id' });
+        loadUserData();
+    }
+
+    // 登录
+    async function handleLogin(email, password) {
+        document.getElementById('loginError').style.display = 'none';
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if(error) {
+            document.getElementById('loginError').innerText = error.message;
+            document.getElementById('loginError').style.display = 'block';
+            return false;
+        }
+        currentUser = data.user;
+        const userName = currentUser.user_metadata?.name || email.split('@')[0];
+        document.getElementById("greetingSub").innerHTML = `${userName}，有问题点大按钮，不着急 ✨`;
+        updateGreeting();
+        
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('registerContainer').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        await loadUserData();
+        return true;
+    }
+
+    // 注册
+    async function handleRegister(email, password, name) {
+        document.getElementById('regError').style.display = 'none';
+        const { data, error } = await supabase.auth.signUp({
+            email, password,
+            options: { data: { name: name } }
+        });
+        if(error) {
+            document.getElementById('regError').innerText = error.message;
+            document.getElementById('regError').style.display = 'block';
+            return false;
+        }
+        if(data.user) {
+            await handleLogin(email, password);
+        }
+        return true;
+    }
+
+    async function logout() {
+        await supabase.auth.signOut();
+        currentUser = null;
+        document.getElementById('loginContainer').style.display = 'block';
+        document.getElementById('registerContainer').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'none';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+    }
+
+    // 检查会话
+    async function checkSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if(session) {
+            currentUser = session.user;
+            const name = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
+            document.getElementById("greetingSub").innerHTML = `${name}，有问题点大按钮，不着急 ✨`;
+            updateGreeting();
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            await loadUserData();
+        } else {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('mainContainer').style.display = 'none';
+        }
+    }
+
+    // 绑定事件
+    function bindEvents() {
+        document.getElementById('doLoginBtn').onclick = () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pwd = document.getElementById('loginPassword').value;
+            if(!email || !pwd) {
+                document.getElementById('loginError').innerText = '请填写邮箱和密码';
+                document.getElementById('loginError').style.display = 'block';
                 return;
             }
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-                timeout: 5000,
-                maximumAge: 600000 // 缓存10分钟
-            });
+            handleLogin(email, pwd);
+        };
+        document.getElementById('showRegisterBtn').onclick = () => {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('registerContainer').style.display = 'block';
+        };
+        document.getElementById('backToLoginBtn').onclick = () => {
+            document.getElementById('registerContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'block';
+        };
+        document.getElementById('doRegisterBtn').onclick = () => {
+            const email = document.getElementById('regEmail').value.trim();
+            const pwd = document.getElementById('regPassword').value;
+            const name = document.getElementById('regName').value.trim() || "长辈";
+            if(!email || !pwd) {
+                document.getElementById('regError').innerText = '邮箱和密码不能为空';
+                document.getElementById('regError').style.display = 'block';
+                return;
+            }
+            if(pwd.length < 6) {
+                document.getElementById('regError').innerText = '密码至少6位';
+                document.getElementById('regError').style.display = 'block';
+                return;
+            }
+            handleRegister(email, pwd, name);
+        };
+        document.getElementById('logoutMainBtn').onclick = () => logout();
+
+        // 模态框事件
+        document.getElementById('openDeptModalBtn').onclick = () => showModal('deptModal');
+        document.getElementById('closeDeptModalBtn').onclick = () => hideModal('deptModal');
+        document.getElementById('openFlowModalBtn').onclick = () => showModal('flowModal');
+        document.getElementById('closeFlowModalBtn').onclick = () => hideModal('flowModal');
+        document.getElementById('openNavModalBtn').onclick = () => showModal('navModal');
+        document.getElementById('closeNavModalBtn').onclick = () => hideModal('navModal');
+        document.getElementById('simulateVoiceBtn').onclick = () => alert("🔊 模拟语音：请前往2楼内科诊区，注意脚下安全");
+        document.getElementById('openSOSModalBtn').onclick = () => showModal('sosModal');
+        document.getElementById('closeSOSModalBtn').onclick = () => hideModal('sosModal');
+        document.getElementById('call120Btn').onclick = () => { if(confirm("确认拨打120急救电话？")) window.location.href = "tel:120"; };
+        document.getElementById('callChildBtn').onclick = () => {
+            let phone = window.currentChildPhone;
+            if(phone && phone !== '未设置') window.location.href = `tel:${phone}`;
+            else alert("请先在健康档案中设置子女电话");
+        };
+        document.getElementById('editChildPhoneBtn').onclick = async () => {
+            let newPhone = prompt("请输入子女/紧急联系人号码", window.currentChildPhone === '未设置' ? '' : window.currentChildPhone);
+            if(newPhone && newPhone.trim()) await updateChildPhone(newPhone.trim());
+        };
+        document.getElementById('openHealthModalBtn').onclick = () => { loadUserData(); showModal('healthModal'); };
+        document.getElementById('closeHealthModalBtn').onclick = () => hideModal('healthModal');
+        document.getElementById('addReminderBtn').onclick = () => {
+            const val = document.getElementById('newReminderInput').value.trim();
+            if(val) addReminder(val);
+            document.getElementById('newReminderInput').value = '';
+        };
+        
+        document.querySelectorAll('.modal-mask').forEach(m => {
+            m.addEventListener('click', (e) => { if(e.target === m) m.classList.remove('active'); });
         });
     }
-    
-    // 6. 根据经纬度获取城市编码
-    async function getCityCodeByLocation(lng, lat) {
-        const url = `https://restapi.amap.com/v3/geocode/regeo?key=${GAODE_API_KEY}&location=${lng},${lat}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.status === '1' && data.regeocode) {
-            return data.regeocode.addressComponent.adcode;
-        } else {
-            throw new Error('地理编码失败');
-        }
-    }
-    
-    // 7. 获取天气并生成健康提醒
-    async function updateWeatherTip(cityCode) {
-        try {
-            // 获取实时天气
-            const weatherUrl = `https://restapi.amap.com/v3/weather/weatherInfo?key=${GAODE_API_KEY}&city=${cityCode}&extensions=base`;
-            const response = await fetch(weatherUrl);
-            const data = await response.json();
-            
-            if (data.status !== '1' || !data.lives || data.lives.length === 0) {
-                throw new Error('天气数据获取失败');
-            }
-            
-            const weather = data.lives[0];
-            const { temperature, weather: condition, humidity, windpower, province, city } = weather;
-            
-            // 生成智能健康提醒
-            const healthAdvice = generateHealthAdvice({
-                temp: parseInt(temperature),
-                condition,
-                humidity: parseInt(humidity),
-                windpower: parseInt(windpower)
-            });
-            
-            // 更新页面显示
-            const locationName = city || province || '本地';
-            healthTipElement.textContent = `${locationName} ${temperature}℃ ${condition}，${healthAdvice}`;
-            
-            // 根据天气类型添加相应图标
-            updateWeatherIcon(condition);
-            
-        } catch (error) {
-            console.error('天气更新失败:', error);
-            healthTipElement.textContent = '天气转凉，就诊记得带件外套';
-        }
-    }
-    
-    // 8. 智能健康建议生成器 (气象+医疗逻辑)
-    function generateHealthAdvice(weather) {
-        const { temp, condition, humidity, windpower } = weather;
-        let advice = '';
-        
-        // 基于温度的建议
-        if (temp <= 5) {
-            advice = '天气寒冷，心血管患者注意头部保暖，避免清晨外出';
-        } else if (temp > 5 && temp <= 12) {
-            advice = '气温较低，注意添衣保暖，预防感冒';
-        } else if (temp > 12 && temp <= 22) {
-            advice = '温度舒适，适合户外活动，建议散步30分钟';
-        } else if (temp > 22 && temp <= 30) {
-            advice = '天气温暖，就诊时注意防晒补水';
-        } else if (temp > 30) {
-            advice = '天气炎热，就诊带好水和伞，避免中暑';
-        }
-        
-        // 基于天气现象的建议 (优先级更高，会覆盖温度建议)
-        const lowerCondition = condition.toLowerCase();
-        if (lowerCondition.includes('雨')) {
-            advice = '雨天路滑，就诊小心慢行，建议携带雨具';
-        } else if (lowerCondition.includes('雪')) {
-            advice = '雪天寒冷，心血管患者注意头部保暖，减少外出';
-        } else if (lowerCondition.includes('雾') || lowerCondition.includes('霾')) {
-            advice = '空气质量不佳，外出请佩戴口罩';
-        } else if (lowerCondition.includes('大风') || windpower >= 5) {
-            advice = '风力较大，注意防风，避免在高楼旁行走';
-        } else if (lowerCondition.includes('阴')) {
-            if (!advice) advice = '天气阴凉，关节不好的老人注意保暖';
-        } else if (lowerCondition.includes('晴')) {
-            if (temp > 15) advice = '天气晴好，适合开窗通风';
-        }
-        
-        // 湿度特别提醒
-        if (humidity > 80 && !advice.includes('雨')) {
-            advice += '，空气潮湿，风湿患者注意关节保暖';
-        }
-        
-        return advice || '祝您就诊顺利，身体健康';
-    }
-    
-    // 9. 更新天气图标 (适老化视觉提示)
-    function updateWeatherIcon(condition) {
-        const iconSpan = document.querySelector('.weather-tip span:first-child');
-        if (!iconSpan) return;
-        
-        const lowerCond = condition.toLowerCase();
-        if (lowerCond.includes('雨')) {
-            iconSpan.textContent = '🌧️';
-        } else if (lowerCond.includes('雪')) {
-            iconSpan.textContent = '❄️';
-        } else if (lowerCond.includes('晴')) {
-            iconSpan.textContent = '☀️';
-        } else if (lowerCond.includes('云') || lowerCond.includes('阴')) {
-            iconSpan.textContent = '☁️';
-        } else if (lowerCond.includes('雾') || lowerCond.includes('霾')) {
-            iconSpan.textContent = '🌫️';
-        } else {
-            iconSpan.textContent = '🌡️';
-        }
-    }
-    
-    // 10. 页面加载时执行 (覆盖原有的 setHealthTip)
-    window.addEventListener('DOMContentLoaded', () => {
-        // 优先执行天气动态提醒
-        fetchWeatherAndUpdateTip();
-        
-        // 原有的 updateGreeting 和 setInterval 保留在 app.js 中，不受影响
-    });
-    
+
+    // 初始化
+    buildDeptButtons();
+    bindEvents();
+    checkSession();
 </script>
-    <script src="assets/js/app.js"></script>
+
+<!-- Supabase 数据库建表 SQL（请在 Supabase SQL Editor 中执行）-->
+
 </body>
 </html>

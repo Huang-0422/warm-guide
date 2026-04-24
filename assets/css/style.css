@@ -164,3 +164,20 @@ input, select {
 input:focus, select:focus {
     border-color: #2d8cf0 !important;
 }
+/* 院内导航全局兼容样式（添加到style.css末尾） */
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+button {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+input, select {
+    outline: none;
+    border: 1px solid #ddd !important;
+}
+input:focus, select:focus {
+    border-color: #2d8cf0 !important;
+}

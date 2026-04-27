@@ -2,736 +2,1194 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>院内导航 · 银龄指南</title>
-    <!-- 引入全局适老基础样式 -->
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>银龄就医-院内导航</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
             height: 100vh;
-            font-size: 18px; /* 适老化基准字号 */
+            overflow: hidden;
+            color: #333;
         }
 
-        /* 左上角返回按钮（和其它页面风格统一） */
-        .back-btn {
+        /* 顶部导航栏 */
+        .header {
+            background: linear-gradient(135deg, #1a6fc4 0%, #0d4a8a 100%);
+            color: white;
+            padding: 12px 16px;
             position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .header-top {
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            font-size: 36px;
-            cursor: pointer;
-            z-index: 100;
-            text-decoration: none;
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.3);
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-            padding-top: 60px; /* 避开返回按钮 */
-        }
-
-        /* ---------- 左侧边栏 ---------- */
-        .sidebar {
-            width: 380px;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            gap: 24px;
-            overflow-y: auto;
+        .header h1 {
             font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .status-bar {
+            display: flex;
+            gap: 6px;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .status-item {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
-        .logo {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        /* 楼层切换 */
+        .floor-tabs {
+            display: flex;
+            gap: 8px;
         }
-        .logo h1 {
-            font-size: 28px;
-            color: #00d4ff;
-            margin-bottom: 6px;
-        }
-        .logo p {
-            font-size: 20px;
-            color: #bbb;
-        }
-
-        .floor-btn {
-            padding: 18px 20px;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            border-radius: 18px;
+        .floor-tab {
+            flex: 1;
+            padding: 8px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-size: 20px;
-            text-align: left;
+            font-weight: 500;
         }
-        .floor-btn.active {
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border-color: #00d4ff;
-            font-weight: bold;
-            color: #000;
-        }
-        .floor-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: bold;
+        .floor-tab.active {
+            background: white;
+            color: #1a6fc4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
-        .nav-panel {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* 搜索栏 */
+        .search-container {
+            position: fixed;
+            top: 110px;
+            left: 16px;
+            right: 16px;
+            z-index: 999;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 12px;
         }
-        .nav-panel h3 {
-            font-size: 22px;
-            color: #00d4ff;
-            margin-bottom: 16px;
-        }
-        .location-select {
-            margin-bottom: 16px;
-        }
-        .location-select label {
-            display: block;
-            font-size: 20px;
-            color: #ddd;
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f0f2f5;
+            border-radius: 8px;
+            padding: 10px 12px;
             margin-bottom: 8px;
         }
-        .location-select select {
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.25);
-            background: rgba(0,0,0,0.5);
-            color: #fff;
-            font-size: 20px;
-            outline: none;
-        }
-        .location-select select option {
-            background: #1a1a2e;
-            color: #fff;
-        }
-
-        .nav-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
+        .search-box input {
             border: none;
-            border-radius: 14px;
-            color: #000;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 8px;
+            background: none;
+            flex: 1;
+            font-size: 15px;
+            outline: none;
+            margin-left: 8px;
         }
-        .clear-btn {
-            width: 100%;
-            padding: 16px;
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 14px;
-            color: #ddd;
-            font-size: 20px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        .search-icon { color: #999; font-size: 18px; }
 
-        .route-info {
-            background: rgba(0, 212, 255, 0.1);
-            border-radius: 16px;
-            padding: 18px;
-            border-left: 4px solid #00d4ff;
-            display: none;
-            font-size: 20px;
-        }
-        .route-info.show { display: block; }
-        .route-info h4 {
-            font-size: 24px;
-            color: #00d4ff;
-            margin-bottom: 12px;
+        /* 快速选择 */
+        .quick-select {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
         }
-        .route-steps { line-height: 1.8; color: #eee; }
-        .distance-badge {
-            display: inline-block;
-            background: #00d4ff;
-            color: #000;
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            margin-left: 6px;
-        }
-
-        .voice-btn {
-            background: rgba(0,212,255,0.2);
-            border: 2px solid #00d4ff;
-            color: #00d4ff;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-size: 20px;
+        .quick-select::-webkit-scrollbar { display: none; }
+        .quick-tag {
+            flex-shrink: 0;
+            padding: 6px 14px;
+            background: #e8f4fd;
+            color: #1a6fc4;
+            border-radius: 16px;
+            font-size: 13px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: 0.2s;
+            border: 1px solid #d0e8f7;
+            transition: all 0.2s;
         }
-        .voice-btn:hover { background: rgba(0,212,255,0.35); }
+        .quick-tag:active { transform: scale(0.95); background: #1a6fc4; color: white; }
 
-        .legend {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.15);
+        /* 地图容器 */
+        .map-container {
+            position: fixed;
+            top: 210px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fafbfc;
+            overflow: hidden;
+            touch-action: none;
         }
-        .legend h4 { font-size: 20px; color: #ccc; margin-bottom: 12px; }
+
+        /* SVG 地图 */
+        .map-svg {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        .map-svg:active { cursor: grabbing; }
+
+        /* 房间样式 */
+        .room {
+            stroke: #c5d9e8;
+            stroke-width: 2;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .room:hover { stroke: #1a6fc4; stroke-width: 3; }
+        .room.selected {
+            stroke: #e74c3c;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.3));
+        }
+        .room.destination {
+            stroke: #27ae60;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 6px rgba(39, 174, 96, 0.3));
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .room-label {
+            font-size: 11px;
+            fill: #555;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: 500;
+        }
+        .room-label.small { font-size: 9px; }
+
+        /* 走廊 */
+        .corridor {
+            fill: #f0f4f8;
+            stroke: #d0dce8;
+            stroke-width: 1;
+        }
+
+        /* 路径 */
+        .path-line {
+            fill: none;
+            stroke: #e74c3c;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 8, 4;
+            animation: dash 1s linear infinite;
+            filter: drop-shadow(0 2px 4px rgba(231, 76, 60, 0.3));
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -24; }
+        }
+
+        .path-arrow {
+            fill: #e74c3c;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+        }
+
+        /* 当前位置标记 */
+        .current-pos {
+            fill: #1a6fc4;
+            filter: drop-shadow(0 0 8px rgba(26, 111, 196, 0.5));
+        }
+        .current-ring {
+            fill: none;
+            stroke: #1a6fc4;
+            stroke-width: 2;
+            opacity: 0.5;
+            animation: ripple 2s infinite;
+        }
+
+        @keyframes ripple {
+            0% { r: 8; opacity: 0.6; }
+            100% { r: 20; opacity: 0; }
+        }
+
+        /* 电梯/楼梯 */
+        .elevator {
+            fill: #fff3cd;
+            stroke: #ffc107;
+            stroke-width: 2;
+        }
+        .stairs {
+            fill: #d4edda;
+            stroke: #28a745;
+            stroke-width: 2;
+        }
+
+        /* 图例 */
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 16px;
+            background: white;
+            border-radius: 10px;
+            padding: 10px 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            font-size: 12px;
+            z-index: 998;
+        }
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-            font-size: 18px;
+            gap: 6px;
+            margin-bottom: 4px;
         }
         .legend-color {
-            width: 22px; height: 22px;
-            border-radius: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
         }
 
-        /* 右侧主视图 */
-        .main-view {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            background: #0a0a1a;
+        /* 导航信息面板 */
+        .nav-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 50vh;
+            overflow-y: auto;
         }
-        .floor-label {
-            position: absolute;
-            top: 80px; left: 20px;
-            background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(10px);
-            padding: 16px 28px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.15);
-            z-index: 10;
-        }
-        .floor-label h2 {
-            font-size: 28px;
-            color: #00d4ff;
-        }
-        .floor-label p {
-            font-size: 20px;
-            color: #bbb;
-            margin-top: 4px;
-        }
-
-        .map-container {
-            width: 100%;
-            height: 100%;
+        .nav-panel.show { transform: translateY(0); }
+        .nav-panel-header {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .nav-panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a6fc4;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+        .nav-info {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        .nav-info-item {
+            flex: 1;
+            text-align: center;
+        }
+        .nav-info-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a6fc4;
+        }
+        .nav-info-label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .nav-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nav-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            background: #1a6fc4;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .step-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .step-text strong { color: #1a6fc4; }
+
+        /* 楼层指示器 */
+        .floor-indicator {
+            position: fixed;
+            left: 16px;
+            bottom: 80px;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            z-index: 998;
+            font-size: 13px;
+            max-width: 120px;
+        }
+        .floor-indicator-title {
+            font-weight: 600;
+            color: #1a6fc4;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        /* 科室详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        .map-svg {
-            max-width: 100%;
-            max-height: 100%;
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            overflow: hidden;
+            animation: modalIn 0.3s ease;
         }
-
-        /* SVG 房间悬浮效果 */
-        .room-hover { cursor: pointer; transition: filter 0.3s; }
-        .room-hover:hover { filter: brightness(1.3); }
-
-        .path-line {
-            stroke-dasharray: 8 4;
-            animation: dash 1s linear infinite;
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
-        @keyframes dash { to { stroke-dashoffset: -20; } }
-
-        .marker-pulse {
-            animation: pulse 1.5s ease-in-out infinite;
+        .modal-header {
+            background: linear-gradient(135deg, #1a6fc4, #0d4a8a);
+            color: white;
+            padding: 20px;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .tooltip {
-            position: fixed;
-            background: rgba(0,0,0,0.9);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 12px;
+        .modal-title {
             font-size: 20px;
-            pointer-events: none;
-            z-index: 1000;
-            display: none;
-            border: 1px solid rgba(0,212,255,0.4);
+            font-weight: 600;
+            margin-bottom: 4px;
         }
+        .modal-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        .modal-info-label { color: #888; }
+        .modal-info-value { color: #333; font-weight: 500; }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .modal-btn-primary {
+            background: #1a6fc4;
+            color: white;
+        }
+        .modal-btn-primary:active { background: #155a9e; }
+        .modal-btn-secondary {
+            background: #f0f2f5;
+            color: #555;
+        }
+
+        /* 提示 toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .toast.show { opacity: 1; }
+
+        /* 缩放控制 */
+        .zoom-controls {
+            position: fixed;
+            right: 16px;
+            bottom: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 998;
+        }
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 20px;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-btn:active { background: #f0f2f5; }
     </style>
+<base target="_blank">
 </head>
 <body>
-    <!-- 返回主页按钮 -->
-    <a href="../index.html" class="back-btn" title="返回首页">←</a>
-
-    <div class="tooltip" id="tooltip"></div>
-
-    <div class="app-container">
-        <!-- 侧边栏 -->
-        <div class="sidebar">
-            <div class="logo">
-                <h1>🏥 院内实时导航</h1>
-                <p>大字指引 · 语音播报</p>
-            </div>
-
-            <!-- 楼层选择 -->
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div class="floor-btn active" data-floor="1" onclick="switchFloor(1)">
-                    <div class="floor-icon">1F</div>
-                    <div>
-                        <div style="font-weight:bold;font-size:22px;">一层 · 门诊大厅</div>
-                        <div style="font-size:18px;color:#aaa;">挂号 / 药房 / 急诊</div>
-                    </div>
-                </div>
-                <div class="floor-btn" data-floor="2" onclick="switchFloor(2)">
-                    <div class="floor-icon">2F</div>
-                    <div>
-                        <div style="font-weight:bold;font-size:22px;">二层 · 诊疗科室</div>
-                        <div style="font-size:18px;color:#aaa;">内科 / 外科 / 检验</div>
-                    </div>
-                </div>
-                <div class="floor-btn" data-floor="3" onclick="switchFloor(3)">
-                    <div class="floor-icon">3F</div>
-                    <div>
-                        <div style="font-weight:bold;font-size:22px;">三层 · 住院部</div>
-                        <div style="font-size:18px;color:#aaa;">病房 / 手术室 / ICU</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 导航面板 -->
-            <div class="nav-panel">
-                <h3>📍 路径规划</h3>
-                <div class="location-select">
-                    <label>我在哪里？</label>
-                    <select id="startPoint">
-                        <option value="">请选择起点…</option>
-                    </select>
-                </div>
-                <div class="location-select">
-                    <label>我要去哪里？</label>
-                    <select id="endPoint">
-                        <option value="">请选择终点…</option>
-                    </select>
-                </div>
-                <button class="nav-btn" onclick="startNavigation()">🚀 开始导航</button>
-                <button class="clear-btn" onclick="clearNavigation()">✖ 清除路线</button>
-            </div>
-
-            <!-- 路径信息（含语音播报） -->
-            <div class="route-info" id="routeInfo">
-                <h4>
-                    📋 导航路线
-                    <button class="voice-btn" onclick="speakNavigation()">🔊 语音播报</button>
-                </h4>
-                <div class="route-steps" id="routeSteps"></div>
-            </div>
-
-            <!-- 图例 -->
-            <div class="legend">
-                <h4>图例说明</h4>
-                <div class="legend-item"><div class="legend-color" style="background:#4CAF50;"></div> 门诊 / 诊室</div>
-                <div class="legend-item"><div class="legend-color" style="background:#2196F3;"></div> 药房 / 收费</div>
-                <div class="legend-item"><div class="legend-color" style="background:#FF9800;"></div> 检查 / 检验</div>
-                <div class="legend-item"><div class="legend-color" style="background:#9C27B0;"></div> 住院 / 病房</div>
-                <div class="legend-item"><div class="legend-color" style="background:#f44336;"></div> 急诊 / 抢救</div>
-                <div class="legend-item"><div class="legend-color" style="background:#607D8B;"></div> 楼梯 / 电梯</div>
-                <div class="legend-item"><div class="legend-color" style="background:#00d4ff;"></div> 导航路线</div>
+    <!-- 顶部 -->
+    <div class="header">
+        <div class="header-top">
+            <h1>🏥 智慧医院导航</h1>
+            <div class="status-bar">
+                <span class="status-item">🟢 营业中</span>
+                <span class="status-item">08:00-22:00</span>
             </div>
         </div>
+        <div class="floor-tabs">
+            <button class="floor-tab active" data-floor="1">一楼 · 门诊</button>
+            <button class="floor-tab" data-floor="2">二楼 · 检查</button>
+            <button class="floor-tab" data-floor="3">三楼 · 住院</button>
+        </div>
+    </div>
 
-        <!-- 右侧地图主视图 -->
-        <div class="main-view">
-            <div class="floor-label">
-                <h2 id="floorTitle">一层 · 门诊大厅</h2>
-                <p id="floorDesc">挂号收费 / 中西药房 / 急诊中心</p>
+    <!-- 搜索 -->
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索科室、药房、诊室..." autocomplete="off">
+        </div>
+        <div class="quick-select" id="quickSelect">
+            <span class="quick-tag" data-room="pharmacy">药房</span>
+            <span class="quick-tag" data-room="emergency">急诊</span>
+            <span class="quick-tag" data-room="registration">挂号处</span>
+            <span class="quick-tag" data-room="radiology">放射科</span>
+            <span class="quick-tag" data-room="laboratory">检验科</span>
+            <span class="quick-tag" data-room="cashier">收费处</span>
+        </div>
+    </div>
+
+    <!-- 地图 -->
+    <div class="map-container" id="mapContainer">
+        <svg class="map-svg" id="mapSvg" viewBox="0 0 800 1200" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e8ecf1" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="800" height="1200" fill="url(#grid)"/>
+            <g id="mapContent"></g>
+        </svg>
+    </div>
+
+    <!-- 缩放控制 -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomIn">+</button>
+        <button class="zoom-btn" id="zoomOut">−</button>
+        <button class="zoom-btn" id="locateMe">📍</button>
+    </div>
+
+    <!-- 图例 -->
+    <div class="legend">
+        <div class="legend-item"><div class="legend-color" style="background:#e8f4fd;border-color:#1a6fc4"></div>普通诊室</div>
+        <div class="legend-item"><div class="legend-color" style="background:#ffe8e8;border-color:#e74c3c"></div>急诊/抢救</div>
+        <div class="legend-item"><div class="legend-color" style="background:#e8f8e8;border-color:#27ae60"></div>药房/收费</div>
+        <div class="legend-item"><div class="legend-color" style="background:#fff3cd;border-color:#ffc107"></div>电梯</div>
+    </div>
+
+    <!-- 楼层信息 -->
+    <div class="floor-indicator" id="floorIndicator">
+        <div class="floor-indicator-title">当前楼层</div>
+        <div id="floorDesc">一楼：门诊大厅、挂号收费、药房、急诊科</div>
+    </div>
+
+    <!-- 导航面板 -->
+    <div class="nav-panel" id="navPanel">
+        <div class="nav-panel-header">
+            <div class="nav-panel-title">🧭 导航路线</div>
+            <button class="close-btn" id="closeNav">&times;</button>
+        </div>
+        <div class="nav-info">
+            <div class="nav-info-item">
+                <div class="nav-info-value" id="navDistance">0m</div>
+                <div class="nav-info-label">距离</div>
             </div>
-            <div class="map-container" id="mapContainer">
-                <!-- 地图由JS动态生成 -->
+            <div class="nav-info-item">
+                <div class="nav-info-value" id="navTime">0min</div>
+                <div class="nav-info-label">预计时间</div>
+            </div>
+            <div class="nav-info-item">
+                <div class="nav-info-value" id="navTurns">0</div>
+                <div class="nav-info-label">转弯</div>
+            </div>
+        </div>
+        <div class="nav-steps" id="navSteps"></div>
+    </div>
+
+    <!-- 科室详情弹窗 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">科室名称</div>
+                <div class="modal-subtitle" id="modalSubtitle">位置信息</div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-info-row">
+                    <span class="modal-info-label">楼层</span>
+                    <span class="modal-info-value" id="modalFloor">-</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-info-label">当前状态</span>
+                    <span class="modal-info-value" id="modalStatus">接诊中</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-info-label">等待人数</span>
+                    <span class="modal-info-value" id="modalWait">-</span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-info-label">工作时间</span>
+                    <span class="modal-info-value">08:00 - 17:30</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" id="modalClose">关闭</button>
+                <button class="modal-btn modal-btn-primary" id="modalNavigate">开始导航</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // ==================== 医院数据及逻辑 ====================
-        const hospitalData = {
-            floors: {
-                1: {
-                    name: "一层 · 门诊大厅",
-                    desc: "挂号收费 / 中西药房 / 急诊中心",
-                    rooms: [
-                        { id: "entrance", name: "医院大门", x: 400, y: 520, w: 120, h: 60, type: "entrance", color: "#4CAF50" },
-                        { id: "reception", name: "导诊台", x: 360, y: 420, w: 80, h: 60, type: "service", color: "#2196F3" },
-                        { id: "register", name: "挂号收费", x: 200, y: 420, w: 100, h: 60, type: "service", color: "#2196F3" },
-                        { id: "pharmacy_w", name: "西药房", x: 520, y: 420, w: 100, h: 60, type: "pharmacy", color: "#2196F3" },
-                        { id: "pharmacy_c", name: "中药房", x: 640, y: 420, w: 100, h: 60, type: "pharmacy", color: "#2196F3" },
-                        { id: "emergency", name: "急诊中心", x: 80, y: 200, w: 140, h: 120, type: "emergency", color: "#f44336" },
-                        { id: "triage", name: "急诊分诊", x: 80, y: 340, w: 100, h: 50, type: "emergency", color: "#f44336" },
-                        { id: "lab_blood", name: "采血中心", x: 600, y: 200, w: 100, h: 80, type: "lab", color: "#FF9800" },
-                        { id: "radiology", name: "放射登记", x: 720, y: 200, w: 100, h: 80, type: "lab", color: "#FF9800" },
-                        { id: "waiting", name: "候诊大厅", x: 280, y: 280, w: 240, h: 100, type: "waiting", color: "#E8EAF6", textColor: "#333" },
-                        { id: "elevator1", name: "电梯", x: 380, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
-                        { id: "stairs1", name: "楼梯", x: 460, y: 160, w: 50, h: 60, type: "stairs", color: "#607D8B" },
-                        { id: "shop", name: "便利店", x: 720, y: 340, w: 100, h: 50, type: "shop", color: "#795548" },
-                    ],
-                    corridors: [
-                        { x1: 140, y1: 380, x2: 760, y2: 380, w: 40 },
-                        { x1: 420, y1: 380, x2: 420, y2: 520, w: 30 },
-                    ]
-                },
-                2: {
-                    name: "二层 · 诊疗科室",
-                    desc: "内科 / 外科 / 检验科",
-                    rooms: [
-                        { id: "internal", name: "内科", x: 80, y: 200, w: 120, h: 100, type: "clinic", color: "#4CAF50" },
-                        { id: "surgery", name: "外科", x: 220, y: 200, w: 120, h: 100, type: "clinic", color: "#4CAF50" },
-                        { id: "pediatrics", name: "儿科", x: 80, y: 320, w: 100, h: 80, type: "clinic", color: "#4CAF50" },
-                        { id: "lab_test", name: "检验科", x: 560, y: 200, w: 120, h: 100, type: "lab", color: "#FF9800" },
-                        { id: "ultrasound", name: "超声科", x: 700, y: 200, w: 120, h: 100, type: "lab", color: "#FF9800" },
-                        { id: "ct", name: "CT室", x: 560, y: 320, w: 100, h: 80, type: "lab", color: "#FF9800" },
-                        { id: "waiting2", name: "候诊区", x: 320, y: 200, w: 200, h: 100, type: "waiting", color: "#E8EAF6", textColor: "#333" },
-                        { id: "elevator2", name: "电梯", x: 380, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
-                    ],
-                    corridors: [
-                        { x1: 140, y1: 380, x2: 760, y2: 380, w: 40 },
-                    ]
-                },
-                3: {
-                    name: "三层 · 住院部",
-                    desc: "病房 / 护士站 / ICU",
-                    rooms: [
-                        { id: "ward_a", name: "A区病房", x: 80, y: 180, w: 140, h: 120, type: "ward", color: "#9C27B0" },
-                        { id: "ward_b", name: "B区病房", x: 240, y: 180, w: 140, h: 120, type: "ward", color: "#9C27B0" },
-                        { id: "nurse_station3", name: "护士站", x: 420, y: 240, w: 100, h: 80, type: "service", color: "#2196F3" },
-                        { id: "or1", name: "手术室", x: 600, y: 180, w: 100, h: 80, type: "or", color: "#f44336" },
-                        { id: "icu", name: "ICU", x: 720, y: 180, w: 100, h: 80, type: "icu", color: "#f44336" },
-                        { id: "elevator3", name: "电梯", x: 420, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
-                    ],
-                    corridors: [
-                        { x1: 140, y1: 400, x2: 760, y2: 400, w: 40 },
-                    ]
-                }
-            }
-        };
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 
-        const connectionPoints = {
+    <script>
+        // ===================== 地图数据 =====================
+        const floorData = {
             1: {
-                "entrance": { x: 420, y: 490 }, "reception": { x: 400, y: 400 },
-                "register": { x: 250, y: 400 }, "pharmacy_w": { x: 570, y: 400 },
-                "emergency": { x: 150, y: 260 }, "lab_blood": { x: 650, y: 240 },
-                "radiology": { x: 770, y: 240 }, "waiting": { x: 400, y: 330 },
-                "elevator1": { x: 410, y: 190 },
+                name: '一楼',
+                desc: '门诊大厅、挂号收费、药房、急诊科',
+                rooms: [
+                    // 门诊大厅中央区域
+                    { id: 'lobby', name: '门诊大厅', x: 300, y: 200, w: 200, h: 120, color: '#f0f8ff', type: 'hall' },
+                    { id: 'registration', name: '挂号处', x: 250, y: 340, w: 120, h: 80, color: '#e8f4fd', type: 'service' },
+                    { id: 'cashier', name: '收费处', x: 430, y: 340, w: 120, h: 80, color: '#e8f4fd', type: 'service' },
+
+                    // 左侧科室
+                    { id: 'emergency', name: '急诊科', x: 50, y: 100, w: 180, h: 150, color: '#ffe8e8', type: 'emergency' },
+                    { id: 'triage', name: '分诊台', x: 50, y: 260, w: 180, h: 60, color: '#fff3cd', type: 'service' },
+                    { id: 'ent', name: '耳鼻喉科', x: 50, y: 340, w: 180, h: 100, color: '#e8f4fd', type: 'clinic' },
+                    { id: 'dermatology', name: '皮肤科', x: 50, y: 460, w: 180, h: 100, color: '#e8f4fd', type: 'clinic' },
+                    { id: 'pediatrics', name: '儿科', x: 50, y: 580, w: 180, h: 120, color: '#e8f8e8', type: 'clinic' },
+                    { id: 'injection', name: '注射室', x: 50, y: 720, w: 180, h: 80, color: '#f0f0f0', type: 'room' },
+
+                    // 右侧科室
+                    { id: 'pharmacy', name: '药房', x: 570, y: 100, w: 180, h: 120, color: '#e8f8e8', type: 'pharmacy' },
+                    { id: 'pharmacy2', name: '中药房', x: 570, y: 240, w: 180, h: 100, color: '#e8f8e8', type: 'pharmacy' },
+                    { id: 'internal', name: '内科诊室', x: 570, y: 360, w: 180, h: 100, color: '#e8f4fd', type: 'clinic' },
+                    { id: 'internal2', name: '内科二诊室', x: 570, y: 480, w: 180, h: 100, color: '#e8f4fd', type: 'clinic' },
+                    { id: 'surgery', name: '外科诊室', x: 570, y: 600, w: 180, h: 100, color: '#e8f4fd', type: 'clinic' },
+                    { id: 'orthopedics', name: '骨科', x: 570, y: 720, w: 180, h: 80, color: '#e8f4fd', type: 'clinic' },
+
+                    // 下方公共区域
+                    { id: 'rest', name: '休息区', x: 250, y: 440, w: 140, h: 80, color: '#faf0e6', type: 'rest' },
+                    { id: 'wc1', name: '卫生间', x: 430, y: 440, w: 120, h: 80, color: '#f5f5f5', type: 'wc' },
+                    { id: 'store', name: '便民超市', x: 250, y: 540, w: 140, h: 80, color: '#faf0e6', type: 'store' },
+                    { id: 'atm', name: 'ATM', x: 430, y: 540, w: 120, h: 80, color: '#f5f5f5', type: 'service' },
+
+                    // 电梯楼梯
+                    { id: 'elevator1', name: '电梯A', x: 360, y: 660, w: 60, h: 60, color: '#fff3cd', type: 'elevator' },
+                    { id: 'elevator2', name: '电梯B', x: 440, y: 660, w: 60, h: 60, color: '#fff3cd', type: 'elevator' },
+                    { id: 'stairs1', name: '楼梯', x: 360, y: 740, w: 60, h: 60, color: '#d4edda', type: 'stairs' },
+                    { id: 'stairs2', name: '楼梯', x: 440, y: 740, w: 60, h: 60, color: '#d4edda', type: 'stairs' },
+                ],
+                corridors: [
+                    { x: 240, y: 330, w: 320, h: 100 }, // 中央横廊
+                    { x: 240, y: 430, w: 320, h: 100 }, // 中下部横廊
+                    { x: 240, y: 530, w: 320, h: 100 }, // 下部横廊
+                    { x: 350, y: 650, w: 160, h: 160 }, // 电梯区域
+                ]
             },
             2: {
-                "internal": { x: 140, y: 250 }, "surgery": { x: 280, y: 250 },
-                "pediatrics": { x: 130, y: 360 }, "lab_test": { x: 620, y: 250 },
-                "ultrasound": { x: 760, y: 250 }, "ct": { x: 610, y: 360 },
-                "waiting2": { x: 420, y: 250 }, "elevator2": { x: 410, y: 190 },
+                name: '二楼',
+                desc: '检验检查、影像中心、功能科',
+                rooms: [
+                    { id: 'lab_hall', name: '检验大厅', x: 300, y: 100, w: 200, h: 100, color: '#f0f8ff', type: 'hall' },
+                    { id: 'laboratory', name: '检验科', x: 50, y: 100, w: 230, h: 120, color: '#e8f4fd', type: 'lab' },
+                    { id: 'blood', name: '采血室', x: 50, y: 240, w: 110, h: 80, color: '#ffe8e8', type: 'lab' },
+                    { id: 'urine', name: '体液室', x: 170, y: 240, w: 110, h: 80, color: '#e8f4fd', type: 'lab' },
+                    { id: 'biochemistry', name: '生化室', x: 50, y: 340, w: 230, h: 80, color: '#e8f4fd', type: 'lab' },
+                    { id: 'immunity', name: '免疫室', x: 50, y: 440, w: 230, h: 80, color: '#e8f4fd', type: 'lab' },
+                    { id: 'microbiology', name: '微生物室', x: 50, y: 540, w: 230, h: 80, color: '#e8f4fd', type: 'lab' },
+
+                    { id: 'radiology', name: '放射科', x: 520, y: 100, w: 230, h: 120, color: '#e8f4fd', type: 'radiology' },
+                    { id: 'ct', name: 'CT室', x: 520, y: 240, w: 110, h: 100, color: '#fff3cd', type: 'radiology' },
+                    { id: 'mri', name: 'MRI室', x: 640, y: 240, w: 110, h: 100, color: '#fff3cd', type: 'radiology' },
+                    { id: 'xray', name: 'X光室', x: 520, y: 360, w: 110, h: 80, color: '#e8f4fd', type: 'radiology' },
+                    { id: 'ultrasound', name: 'B超室', x: 640, y: 360, w: 110, h: 80, color: '#e8f4fd', type: 'radiology' },
+                    { id: 'mammography', name: '钼靶室', x: 520, y: 460, w: 110, h: 80, color: '#e8f4fd', type: 'radiology' },
+                    { id: 'endoscopy', name: '内镜中心', x: 640, y: 460, w: 110, h: 80, color: '#e8f4fd', type: 'radiology' },
+
+                    { id: 'ecg', name: '心电图室', x: 300, y: 220, w: 90, h: 80, color: '#e8f4fd', type: 'exam' },
+                    { id: 'eeg', name: '脑电图室', x: 410, y: 220, w: 90, h: 80, color: '#e8f4fd', type: 'exam' },
+                    { id: 'pulmonary', name: '肺功能室', x: 300, y: 320, w: 90, h: 80, color: '#e8f4fd', type: 'exam' },
+                    { id: 'treadmill', name: '运动平板', x: 410, y: 320, w: 90, h: 80, color: '#e8f4fd', type: 'exam' },
+
+                    { id: 'pathology', name: '病理科', x: 300, y: 420, w: 200, h: 80, color: '#e8f4fd', type: 'lab' },
+                    { id: 'report', name: '报告领取', x: 300, y: 520, w: 200, h: 80, color: '#e8f8e8', type: 'service' },
+
+                    { id: 'wc2', name: '卫生间', x: 50, y: 640, w: 100, h: 60, color: '#f5f5f5', type: 'wc' },
+                    { id: 'elevator1', name: '电梯A', x: 360, y: 640, w: 60, h: 60, color: '#fff3cd', type: 'elevator' },
+                    { id: 'elevator2', name: '电梯B', x: 440, y: 640, w: 60, h: 60, color: '#fff3cd', type: 'elevator' },
+                    { id: 'stairs1', name: '楼梯', x: 360, y: 720, w: 60, h: 60, color: '#d4edda', type: 'stairs' },
+                    { id: 'stairs2', name: '楼梯', x: 440, y: 720, w: 60, h: 60, color: '#d4edda', type: 'stairs' },
+                    { id: 'waiting', name: '候检区', x: 520, y: 560, w: 230, h: 100, color: '#faf0e6', type: 'rest' },
+                ],
+                corridors: [
+                    { x: 290, y: 90, w: 220, h: 120 },
+                    { x: 290, y: 210, w: 220, h: 200 },
+                    { x: 290, y: 410, w: 220, h: 200 },
+                    { x: 350, y: 630, w: 160, h: 160 },
+                ]
             },
             3: {
-                "ward_a": { x: 150, y: 240 }, "ward_b": { x: 310, y: 240 },
-                "nurse_station3": { x: 470, y: 280 }, "or1": { x: 650, y: 220 },
-                "icu": { x: 770, y: 220 }, "elevator3": { x: 450, y: 190 },
+                name: '三楼',
+                desc: '住院部、护士站、病房区',
+                rooms: [
+                    { id: 'nurse_station', name: '护士站', x: 300, y: 100, w: 200, h: 80, color: '#e8f4fd', type: 'nurse' },
+                    { id: 'doctor_office', name: '医生办公室', x: 300, y: 200, w: 200, h: 80, color: '#e8f4fd', type: 'office' },
+                    { id: 'ward_a1', name: 'A区病房1', x: 50, y: 100, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_a2', name: 'A区病房2', x: 50, y: 200, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_a3', name: 'A区病房3', x: 50, y: 300, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_a4', name: 'A区病房4', x: 50, y: 400, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_a5', name: 'A区病房5', x: 50, y: 500, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_a6', name: 'A区病房6', x: 50, y: 600, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+
+                    { id: 'ward_b1', name: 'B区病房1', x: 630, y: 100, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_b2', name: 'B区病房2', x: 630, y: 200, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_b3', name: 'B区病房3', x: 630, y: 300, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_b4', name: 'B区病房4', x: 630, y: 400, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_b5', name: 'B区病房5', x: 630, y: 500, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+                    { id: 'ward_b6', name: 'B区病房6', x: 630, y: 600, w: 120, h: 80, color: '#f0f8ff', type: 'ward' },
+
+                    { id: 'icu', name: '重症监护室', x: 300, y: 300, w: 200, h: 100, color: '#ffe8e8', type: 'icu' },
+                    { id: 'nicu', name: '新生儿监护', x: 300, y: 420, w: 200, h: 80, color: '#ffe8e8', type: 'icu' },
+                    { id: 'delivery', name: '产房', x: 300, y: 520, w: 95, h: 80, color: '#e8f8e8', type: 'delivery' },
+                    { id: 'operating', name: '手术室', x: 405, y: 520, w: 95, h: 80, color: '#fff3cd', type: 'operating' },
+
+                    { id: 'pantry', name: '配餐间', x: 190, y: 100, w: 90, h: 80, color: '#faf0e6', type: 'service' },
+                    { id: 'pantry2', name: '配餐间', x: 520, y: 100, w: 90, h: 80, color: '#faf0e6', type: 'service' },
+                    { id: 'wc3', name: '卫生间', x: 190, y: 200, w: 90, h: 60, color: '#f5f5f5', type: 'wc' },
+                    { id: 'wc4', name: '卫生间', x: 520, y: 200, w: 90, h: 60, color: '#f5f5f5', type: 'wc' },
+
+                    { id: 'elevator1', name: '电梯A', x: 360, y: 640, w: 60, h: 60, color: '#fff3cd', type: 'elevator' },
+                    { id: 'elevator2', name: '电梯B', x: 440, y: 640, w: 60, h: 60, color: '#fff3cd', type: 'elevator' },
+                    { id: 'stairs1', name: '楼梯', x: 360, y: 720, w: 60, h: 60, color: '#d4edda', type: 'stairs' },
+                    { id: 'stairs2', name: '楼梯', x: 440, y: 720, w: 60, h: 60, color: '#d4edda', type: 'stairs' },
+                ],
+                corridors: [
+                    { x: 290, y: 90, w: 220, h: 200 },
+                    { x: 290, y: 290, w: 220, h: 320 },
+                    { x: 350, y: 630, w: 160, h: 160 },
+                ]
             }
         };
 
-        const floorConnections = {
-            "elevator": { 1: "elevator1", 2: "elevator2", 3: "elevator3" },
-        };
+        // 所有房间索引（用于搜索）
+        const allRooms = [];
+        Object.keys(floorData).forEach(floor => {
+            floorData[floor].rooms.forEach(room => {
+                allRooms.push({ ...room, floor: parseInt(floor) });
+            });
+        });
 
+        // ===================== 状态管理 =====================
         let currentFloor = 1;
-        let navigationPath = [];
-        let startRoom = null;
-        let endRoom = null;
-        let routeDescription = '';
+        let selectedRoom = null;
+        let destinationRoom = null;
+        let currentPos = { x: 400, y: 700, floor: 1 }; // 默认在一楼大厅入口
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX, startY;
 
-        function init() {
-            populateLocationSelects();
-            renderMap(1);
-        }
+        // ===================== 渲染地图 =====================
+        function renderMap() {
+            const svg = document.getElementById('mapContent');
+            const data = floorData[currentFloor];
+            let html = '';
 
-        function populateLocationSelects() {
-            const startSelect = document.getElementById('startPoint');
-            const endSelect = document.getElementById('endPoint');
-            startSelect.innerHTML = '<option value="">请选择起点…</option>';
-            endSelect.innerHTML = '<option value="">请选择终点…</option>';
+            // 渲染走廊
+            data.corridors.forEach(c => {
+                html += `<rect class="corridor" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="4"/>`;
+            });
 
-            for (let floor = 1; floor <= 3; floor++) {
-                const floorData = hospitalData.floors[floor];
-                const optgroupStart = document.createElement('optgroup');
-                optgroupStart.label = floorData.name;
-                const optgroupEnd = document.createElement('optgroup');
-                optgroupEnd.label = floorData.name;
+            // 渲染房间
+            data.rooms.forEach(room => {
+                const isSelected = selectedRoom && selectedRoom.id === room.id;
+                const isDest = destinationRoom && destinationRoom.id === room.id;
+                const cls = isSelected ? 'selected' : (isDest ? 'destination' : '');
+                const labelCls = room.name.length > 4 ? 'small' : '';
 
-                floorData.rooms.forEach(room => {
-                    const optionStart = document.createElement('option');
-                    optionStart.value = `${floor}-${room.id}`;
-                    optionStart.textContent = room.name;
-                    optgroupStart.appendChild(optionStart);
+                html += `
+                    <g class="room-group" data-id="${room.id}">
+                        <rect class="room ${cls}" 
+                              x="${room.x}" y="${room.y}" 
+                              width="${room.w}" height="${room.h}" 
+                              rx="6" fill="${room.color}"
+                              data-id="${room.id}"/>
+                        <text class="room-label ${labelCls}" 
+                              x="${room.x + room.w/2}" 
+                              y="${room.y + room.h/2 + 4}">${room.name}</text>
+                    </g>
+                `;
+            });
 
-                    const optionEnd = document.createElement('option');
-                    optionEnd.value = `${floor}-${room.id}`;
-                    optionEnd.textContent = room.name;
-                    optgroupEnd.appendChild(optionEnd);
-                });
-                startSelect.appendChild(optgroupStart);
-                endSelect.appendChild(optgroupEnd);
+            // 渲染当前位置
+            if (currentPos.floor === currentFloor) {
+                html += `
+                    <circle class="current-ring" cx="${currentPos.x}" cy="${currentPos.y}"/>
+                    <circle class="current-pos" cx="${currentPos.x}" cy="${currentPos.y}" r="8"/>
+                    <text x="${currentPos.x}" y="${currentPos.y - 15}" text-anchor="middle" 
+                          fill="#1a6fc4" font-size="11" font-weight="600">您在这里</text>
+                `;
             }
-        }
 
-        function renderMap(floor) {
-            const container = document.getElementById('mapContainer');
-            const floorData = hospitalData.floors[floor];
-            let svg = `<svg class="map-svg" viewBox="0 0 900 600" width="100%" height="100%">`;
-            svg += `<rect x="0" y="0" width="900" height="600" fill="#0a0a1a" rx="15"/>`;
-            svg += `<rect x="20" y="20" width="860" height="560" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="2" rx="10"/>`;
+            // 渲染路径
+            if (destinationRoom && pathPoints.length > 0) {
+                const pathD = pathPoints.map((p, i) => (i === 0 ? 'M' : 'L') + `${p.x},${p.y}`).join(' ');
+                html += `<path class="path-line" d="${pathD}"/>`;
 
-            // 走廊
-            floorData.corridors.forEach(corr => {
-                svg += `<rect x="${corr.x1 - corr.w/2}" y="${corr.y1 - corr.w/2}" 
-                        width="${Math.abs(corr.x2 - corr.x1) + corr.w}" height="${Math.abs(corr.y2 - corr.y1) + corr.w}" 
-                        fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>`;
-            });
-
-            // 房间
-            floorData.rooms.forEach(room => {
-                const isStart = startRoom && startRoom.floor === floor && startRoom.id === room.id;
-                const isEnd = endRoom && endRoom.floor === floor && endRoom.id === room.id;
-                const isOnPath = navigationPath.some(p => p.floor === floor && p.roomId === room.id);
-
-                let strokeColor = "rgba(255,255,255,0.2)";
-                let strokeWidth = 1;
-                if (isStart) { strokeColor = "#00ff00"; strokeWidth = 3; }
-                else if (isEnd) { strokeColor = "#ff0000"; strokeWidth = 3; }
-                else if (isOnPath) { strokeColor = "#00d4ff"; strokeWidth = 2; }
-
-                svg += `<rect class="room-hover" x="${room.x}" y="${room.y}" width="${room.w}" height="${room.h}" 
-                        fill="${room.color}" fill-opacity="0.25" stroke="${strokeColor}" stroke-width="${strokeWidth}" rx="6"
-                        onmouseenter="showTooltip(event, '${room.name}')" onmouseleave="hideTooltip()"
-                        onclick="selectRoom('${floor}', '${room.id}')"/>`;
-
-                const cx = room.x + room.w/2;
-                const cy = room.y + room.h/2;
-                const labelColor = room.textColor || '#fff';
-                svg += `<text class="room-label" x="${cx}" y="${cy}" fill="${labelColor}" font-size="16" text-anchor="middle" dominant-baseline="middle">${room.name}</text>`;
-
-                if (isStart) svg += `<circle cx="${cx}" cy="${room.y - 8}" r="8" fill="#00ff00"/>`;
-                if (isEnd) svg += `<circle cx="${cx}" cy="${room.y - 8}" r="8" fill="#ff0000"/>`;
-            });
-
-            // 路径
-            if (navigationPath.length > 0) {
-                const floorPath = navigationPath.filter(p => p.floor === floor);
-                if (floorPath.length > 1) {
-                    let d = `M ${floorPath[0].x} ${floorPath[0].y}`;
-                    for (let i = 1; i < floorPath.length; i++) d += ` L ${floorPath[i].x} ${floorPath[i].y}`;
-                    svg += `<path d="${d}" fill="none" stroke="#00d4ff" stroke-width="4" class="path-line"/>`;
+                // 路径箭头
+                for (let i = 1; i < pathPoints.length; i += 3) {
+                    const prev = pathPoints[i-1];
+                    const curr = pathPoints[i];
+                    const angle = Math.atan2(curr.y - prev.y, curr.x - prev.x);
+                    html += `
+                        <polygon class="path-arrow" 
+                                 points="0,-4 8,0 0,4" 
+                                 transform="translate(${curr.x},${curr.y}) rotate(${angle * 180 / Math.PI})"/>
+                    `;
                 }
             }
 
-            svg += `</svg>`;
-            container.innerHTML = svg;
+            svg.innerHTML = html;
+
+            // 绑定点击事件
+            svg.querySelectorAll('.room').forEach(rect => {
+                rect.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const roomId = e.target.dataset.id;
+                    const room = data.rooms.find(r => r.id === roomId);
+                    showRoomModal(room);
+                });
+            });
         }
 
+        let pathPoints = [];
+
+        // ===================== 路径规划 =====================
+        function calculatePath(start, end) {
+            // 简化版 A* 路径规划
+            // 如果同楼层，直接走走廊连接
+            if (start.floor === end.floor) {
+                return calculateSameFloorPath(start, end);
+            } else {
+                // 跨楼层：先到电梯，换楼层，再到目的地
+                const elevator = findNearestElevator(start);
+                const path1 = calculateSameFloorPath(start, elevator);
+                const path2 = calculateSameFloorPath({ ...elevator, floor: end.floor }, end);
+                return { path1, path2, elevator, needChangeFloor: true };
+            }
+        }
+
+        function findNearestElevator(pos) {
+            const rooms = floorData[pos.floor].rooms;
+            let nearest = null;
+            let minDist = Infinity;
+            rooms.forEach(r => {
+                if (r.type === 'elevator' || r.type === 'stairs') {
+                    const dist = Math.hypot(r.x + r.w/2 - pos.x, r.y + r.h/2 - pos.y);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearest = r;
+                    }
+                }
+            });
+            return nearest;
+        }
+
+        function calculateSameFloorPath(start, end) {
+            const sx = start.x || (start.w ? start.x + start.w/2 : start.x);
+            const sy = start.y || (start.h ? start.y + start.h/2 : start.y);
+            const ex = end.x || (end.w ? end.x + end.w/2 : end.x);
+            const ey = end.y || (end.h ? end.y + end.h/2 : end.y);
+
+            // 简化的走廊路径：通过中央走廊连接
+            const midY = 380; // 中央走廊Y坐标
+            const points = [];
+
+            points.push({ x: sx, y: sy });
+
+            // 从起点到走廊
+            if (Math.abs(sy - midY) > 50) {
+                points.push({ x: sx, y: midY });
+            }
+
+            // 沿走廊移动到目标X
+            if (Math.abs(sx - ex) > 50) {
+                points.push({ x: ex, y: midY });
+            }
+
+            // 从走廊到终点
+            if (Math.abs(ey - midY) > 50) {
+                points.push({ x: ex, y: ey });
+            }
+
+            return points;
+        }
+
+        function startNavigation(room) {
+            destinationRoom = { ...room, floor: currentFloor };
+
+            // 如果目标在其他楼层，先切换楼层显示
+            if (room.floor && room.floor !== currentFloor) {
+                switchFloor(room.floor);
+            }
+
+            const result = calculatePath(currentPos, destinationRoom);
+
+            if (result.needChangeFloor) {
+                pathPoints = [...result.path1, ...result.path2];
+            } else {
+                pathPoints = result;
+            }
+
+            renderMap();
+            showNavPanel(room, result);
+        }
+
+        // ===================== 导航面板 =====================
+        function showNavPanel(room, pathResult) {
+            const panel = document.getElementById('navPanel');
+            const distance = Math.round(calculateTotalDistance(pathPoints));
+            const time = Math.ceil(distance / 60); // 假设 60m/min
+            const turns = countTurns(pathPoints);
+
+            document.getElementById('navDistance').textContent = distance + 'm';
+            document.getElementById('navTime').textContent = time + 'min';
+            document.getElementById('navTurns').textContent = turns;
+
+            const stepsDiv = document.getElementById('navSteps');
+            let stepsHtml = '';
+
+            if (pathResult.needChangeFloor) {
+                const targetFloor = floorData[destinationRoom.floor].name;
+                stepsHtml += `
+                    <div class="nav-step">
+                        <div class="step-icon">1</div>
+                        <div class="step-text">从当前位置前往<strong>电梯/楼梯</strong></div>
+                    </div>
+                    <div class="nav-step">
+                        <div class="step-icon">2</div>
+                        <div class="step-text">乘坐电梯前往<strong>${targetFloor}</strong></div>
+                    </div>
+                    <div class="nav-step">
+                        <div class="step-icon">3</div>
+                        <div class="step-text">出电梯后前往<strong>${room.name}</strong></div>
+                    </div>
+                `;
+            } else {
+                stepsHtml += `
+                    <div class="nav-step">
+                        <div class="step-icon">1</div>
+                        <div class="step-text">从当前位置出发</div>
+                    </div>
+                    <div class="nav-step">
+                        <div class="step-icon">2</div>
+                        <div class="step-text">沿主走廊前往<strong>${room.name}</strong>方向</div>
+                    </div>
+                    <div class="nav-step">
+                        <div class="step-icon">✓</div>
+                        <div class="step-text">到达<strong>${room.name}</strong></div>
+                    </div>
+                `;
+            }
+
+            stepsDiv.innerHTML = stepsHtml;
+            panel.classList.add('show');
+        }
+
+        function calculateTotalDistance(points) {
+            let dist = 0;
+            for (let i = 1; i < points.length; i++) {
+                dist += Math.hypot(points[i].x - points[i-1].x, points[i].y - points[i-1].y);
+            }
+            return dist * 0.5; // 缩放比例
+        }
+
+        function countTurns(points) {
+            let turns = 0;
+            for (let i = 2; i < points.length; i++) {
+                const dx1 = points[i-1].x - points[i-2].x;
+                const dy1 = points[i-1].y - points[i-2].y;
+                const dx2 = points[i].x - points[i-1].x;
+                const dy2 = points[i].y - points[i-1].y;
+                if (dx1 * dx2 + dy1 * dy2 === 0) turns++;
+            }
+            return turns;
+        }
+
+        document.getElementById('closeNav').addEventListener('click', () => {
+            document.getElementById('navPanel').classList.remove('show');
+            destinationRoom = null;
+            pathPoints = [];
+            renderMap();
+        });
+
+        // ===================== 科室详情弹窗 =====================
+        function showRoomModal(room) {
+            const modal = document.getElementById('modalOverlay');
+            document.getElementById('modalTitle').textContent = room.name;
+            document.getElementById('modalSubtitle').textContent = floorData[currentFloor].name;
+            document.getElementById('modalFloor').textContent = floorData[currentFloor].name;
+            document.getElementById('modalWait').textContent = Math.floor(Math.random() * 15) + '人';
+
+            modal.classList.add('show');
+            selectedRoom = room;
+            renderMap();
+
+            document.getElementById('modalNavigate').onclick = () => {
+                modal.classList.remove('show');
+                startNavigation(room);
+            };
+        }
+
+        document.getElementById('modalClose').addEventListener('click', () => {
+            document.getElementById('modalOverlay').classList.remove('show');
+            selectedRoom = null;
+            renderMap();
+        });
+
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                document.getElementById('modalOverlay').classList.remove('show');
+                selectedRoom = null;
+                renderMap();
+            }
+        });
+
+        // ===================== 楼层切换 =====================
         function switchFloor(floor) {
             currentFloor = floor;
-            document.querySelectorAll('.floor-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.floor-btn[data-floor="${floor}"]`).classList.add('active');
-            const fd = hospitalData.floors[floor];
-            document.getElementById('floorTitle').textContent = fd.name;
-            document.getElementById('floorDesc').textContent = fd.desc;
-            renderMap(floor);
+            document.querySelectorAll('.floor-tab').forEach(tab => {
+                tab.classList.toggle('active', parseInt(tab.dataset.floor) === floor);
+            });
+            document.getElementById('floorDesc').textContent = floorData[floor].desc;
+            document.getElementById('floorIndicator').querySelector('.floor-indicator-title').textContent = floorData[floor].name;
+            renderMap();
         }
 
-        function selectRoom(floor, roomId) {
-            if (!startRoom) {
-                document.getElementById('startPoint').value = `${floor}-${roomId}`;
-                startRoom = { floor, id: roomId };
-            } else if (!endRoom && (floor !== startRoom.floor || roomId !== startRoom.id)) {
-                document.getElementById('endPoint').value = `${floor}-${roomId}`;
-                endRoom = { floor, id: roomId };
-                startNavigation();
-            } else {
-                // 重新选择
-                startRoom = { floor, id: roomId };
-                endRoom = null;
-                document.getElementById('startPoint').value = `${floor}-${roomId}`;
-                document.getElementById('endPoint').value = '';
-                navigationPath = [];
-                document.getElementById('routeInfo').classList.remove('show');
-            }
-            renderMap(currentFloor);
-        }
-
-        function showTooltip(e, text) {
-            const t = document.getElementById('tooltip');
-            t.textContent = text;
-            t.style.display = 'block';
-            t.style.left = e.clientX + 15 + 'px';
-            t.style.top = e.clientY + 15 + 'px';
-        }
-        function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
-
-        function startNavigation() {
-            const sv = document.getElementById('startPoint').value;
-            const ev = document.getElementById('endPoint').value;
-            if (!sv || !ev) { alert('请选择起点和终点'); return; }
-            const [sf, si] = sv.split('-');
-            const [ef, ei] = ev.split('-');
-            startRoom = { floor: +sf, id: si };
-            endRoom = { floor: +ef, id: ei };
-            navigationPath = calculatePath(startRoom, endRoom);
-            displayRouteInfo();
-            if (navigator.vibrate) navigator.vibrate(30);
-            switchFloor(startRoom.floor);
-        }
-
-        function calculatePath(start, end) {
-            const path = [];
-            const startPt = connectionPoints[start.floor]?.[start.id];
-            const endPt = connectionPoints[end.floor]?.[end.id];
-            if (!startPt || !endPt) return path;
-
-            if (start.floor === end.floor) {
-                const cy = start.floor === 3 ? 400 : 380;
-                path.push({ floor: start.floor, roomId: start.id, x: startPt.x, y: startPt.y });
-                if (Math.abs(startPt.y - cy) > 20) path.push({ floor: start.floor, x: startPt.x, y: cy });
-                if (Math.abs(startPt.x - endPt.x) > 20) path.push({ floor: start.floor, x: endPt.x, y: cy });
-                if (Math.abs(endPt.y - cy) > 20) path.push({ floor: start.floor, x: endPt.x, y: endPt.y });
-                path.push({ floor: start.floor, roomId: end.id, x: endPt.x, y: endPt.y });
-            } else {
-                const elevStartKey = floorConnections.elevator[start.floor];
-                const elevEndKey = floorConnections.elevator[end.floor];
-                const elevStart = connectionPoints[start.floor]?.[elevStartKey];
-                const elevEnd = connectionPoints[end.floor]?.[elevEndKey];
-                if (!elevStart || !elevEnd) return path;
-                const cy1 = start.floor === 3 ? 400 : 380;
-                const cy2 = end.floor === 3 ? 400 : 380;
-
-                path.push({ floor: start.floor, roomId: start.id, x: startPt.x, y: startPt.y });
-                path.push({ floor: start.floor, x: startPt.x, y: cy1 });
-                path.push({ floor: start.floor, x: elevStart.x, y: cy1 });
-                path.push({ floor: start.floor, roomId: elevStartKey, x: elevStart.x, y: elevStart.y });
-                path.push({ floor: end.floor, roomId: elevEndKey, x: elevEnd.x, y: elevEnd.y });
-                path.push({ floor: end.floor, x: elevEnd.x, y: cy2 });
-                path.push({ floor: end.floor, x: endPt.x, y: cy2 });
-                path.push({ floor: end.floor, x: endPt.x, y: endPt.y });
-                path.push({ floor: end.floor, roomId: end.id, x: endPt.x, y: endPt.y });
-            }
-            return path;
-        }
-
-        function displayRouteInfo() {
-            const info = document.getElementById('routeInfo');
-            const stepsDiv = document.getElementById('routeSteps');
-            if (!startRoom || !endRoom) return;
-            const startName = hospitalData.floors[startRoom.floor].rooms.find(r=>r.id===startRoom.id)?.name;
-            const endName = hospitalData.floors[endRoom.floor].rooms.find(r=>r.id===endRoom.id)?.name;
-
-            let steps = `<div class="step">📍 起点：${startRoom.floor}F ${startName}</div>`;
-            if (startRoom.floor !== endRoom.floor) steps += `<div class="step">🛗 乘电梯 ${startRoom.floor}F → ${endRoom.floor}F</div>`;
-            steps += `<div class="step">🏁 终点：${endRoom.floor}F ${endName}</div>`;
-
-            let dist = 0;
-            for (let i=1; i<navigationPath.length; i++) {
-                const dx = navigationPath[i].x - navigationPath[i-1].x;
-                const dy = navigationPath[i].y - navigationPath[i-1].y;
-                dist += Math.sqrt(dx*dx+dy*dy);
-            }
-            const realDist = Math.round(dist * 0.5);
-            const time = Math.ceil(realDist / 60);
-            steps += `<div class="step" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);">`;
-            steps += `📏 约 <span class="distance-badge">${realDist} 米</span> ⏱️ 步行约 ${time} 分钟`;
-            steps += `</div>`;
-
-            stepsDiv.innerHTML = steps;
-            info.classList.add('show');
-
-            // 生成语音文本
-            let speech = `从${startRoom.floor}楼${startName}出发，`;
-            if (startRoom.floor !== endRoom.floor) speech += `坐电梯到${endRoom.floor}楼，`;
-            speech += `前往${endName}。全程大约${realDist}米，步行需要${time}分钟。`;
-            routeDescription = speech;
-        }
-
-        function clearNavigation() {
-            startRoom = endRoom = null;
-            navigationPath = [];
-            document.getElementById('startPoint').value = '';
-            document.getElementById('endPoint').value = '';
-            document.getElementById('routeInfo').classList.remove('show');
-            routeDescription = '';
-            renderMap(currentFloor);
-        }
-
-        function speakNavigation() {
-            if (!routeDescription) { alert('请先规划一条路线'); return; }
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(routeDescription);
-                u.lang = 'zh-CN'; u.rate = 0.9; u.pitch = 1.0;
-                window.speechSynthesis.speak(u);
-                if (navigator.vibrate) navigator.vibrate(50);
-            } else alert('您的浏览器不支持语音');
-        }
-
-        document.getElementById('startPoint').addEventListener('change', function() {
-            if (this.value) {
-                const [f, id] = this.value.split('-');
-                startRoom = { floor: +f, id };
-                renderMap(currentFloor);
-            }
+        document.querySelectorAll('.floor-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchFloor(parseInt(tab.dataset.floor));
+            });
         });
-        document.getElementById('endPoint').addEventListener('change', function() {
-            if (this.value) {
-                const [f, id] = this.value.split('-');
-                endRoom = { floor: +f, id };
-                renderMap(currentFloor);
+
+        // ===================== 搜索功能 =====================
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (!query) return;
+
+            const matched = allRooms.filter(r => r.name.includes(query));
+            if (matched.length > 0) {
+                const room = matched[0];
+                if (room.floor !== currentFloor) {
+                    switchFloor(room.floor);
+                }
+                selectedRoom = room;
+                renderMap();
+
+                // 高亮显示
+                showToast(`已定位：${room.name}`);
             }
         });
 
-        init();
+        // ===================== 快速选择 =====================
+        document.querySelectorAll('.quick-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const roomId = tag.dataset.room;
+                // 查找房间（可能在任意楼层）
+                let found = null;
+                let foundFloor = null;
+                Object.keys(floorData).forEach(f => {
+                    const room = floorData[f].rooms.find(r => r.id === roomId);
+                    if (room) {
+                        found = room;
+                        foundFloor = parseInt(f);
+                    }
+                });
+
+                if (found) {
+                    if (foundFloor !== currentFloor) {
+                        switchFloor(foundFloor);
+                    }
+                    showRoomModal(found);
+                }
+            });
+        });
+
+        // ===================== 地图交互（缩放/拖拽） =====================
+        const mapSvg = document.getElementById('mapSvg');
+        const mapContent = document.getElementById('mapContent');
+
+        function updateTransform() {
+            mapContent.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            mapContent.style.transformOrigin = 'center center';
+        }
+
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            scale = Math.min(scale * 1.2, 3);
+            updateTransform();
+        });
+
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            scale = Math.max(scale / 1.2, 0.5);
+            updateTransform();
+        });
+
+        document.getElementById('locateMe').addEventListener('click', () => {
+            if (currentPos.floor !== currentFloor) {
+                switchFloor(currentPos.floor);
+            }
+            showToast('已定位到您的位置');
+            renderMap();
+        });
+
+        // 触摸拖拽
+        const container = document.getElementById('mapContainer');
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (isDragging && e.touches.length === 1) {
+                e.preventDefault();
+                translateX = e.touches[0].clientX - startX;
+                translateY = e.touches[0].clientY - startY;
+                updateTransform();
+            }
+        });
+
+        container.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // 鼠标拖拽
+        container.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform();
+            }
+        });
+
+        container.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        container.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        // 滚轮缩放
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.max(0.5, Math.min(3, scale * delta));
+            updateTransform();
+        });
+
+        // ===================== 工具函数 =====================
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // ===================== 初始化 =====================
+        renderMap();
+        updateTransform();
+
+        // 模拟实时位置更新
+        setInterval(() => {
+            // 这里可以接入真实的室内定位
+        }, 5000);
     </script>
 </body>
 </html>

@@ -4,15 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>院内导航 · 银龄指南</title>
-    <!-- 引入全局适老化样式 -->
+    <!-- 引入全局适老基础样式 -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        /* 在全局样式基础上按需微调 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -20,47 +15,47 @@
             color: #fff;
             overflow: hidden;
             height: 100vh;
-            /* 适老化基础字号增大 */
-            font-size: 18px;
+            font-size: 18px; /* 适老化基准字号 */
         }
 
+        /* 左上角返回按钮（和其它页面风格统一） */
         .back-btn {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            width: 56px;
-            height: 56px;
-            border-radius: 28px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            font-size: 32px;
+            font-size: 36px;
             cursor: pointer;
             z-index: 100;
             text-decoration: none;
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
         .app-container {
             display: flex;
             height: 100vh;
-            padding-top: 10px;
+            padding-top: 60px; /* 避开返回按钮 */
         }
 
-        /* ---------- 侧边栏 ---------- */
+        /* ---------- 左侧边栏 ---------- */
         .sidebar {
-            width: 360px;
-            background: rgba(0, 0, 0, 0.4);
+            width: 380px;
+            background: rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            gap: 20px;
+            padding: 24px;
+            gap: 24px;
             overflow-y: auto;
             font-size: 18px;
         }
@@ -70,261 +65,195 @@
             padding-bottom: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .logo h1 {
-            font-size: 24px;
+            font-size: 28px;
             color: #00d4ff;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
-
         .logo p {
-            font-size: 16px;
-            color: #aaa;
-        }
-
-        .floor-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            font-size: 20px;
+            color: #bbb;
         }
 
         .floor-btn {
-            padding: 16px 20px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 18px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
             background: rgba(255, 255, 255, 0.05);
             color: #fff;
-            border-radius: 16px;
+            border-radius: 18px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 14px;
-            font-size: 18px;
+            font-size: 20px;
             text-align: left;
         }
-
-        .floor-btn:hover {
-            background: rgba(0, 212, 255, 0.1);
-            border-color: rgba(0, 212, 255, 0.3);
-        }
-
         .floor-btn.active {
             background: linear-gradient(135deg, #00d4ff, #0099cc);
             border-color: #00d4ff;
-            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
             font-weight: bold;
+            color: #000;
         }
-
         .floor-icon {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             background: rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
         }
 
         .nav-panel {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
             padding: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .nav-panel h3 {
-            font-size: 20px;
+            font-size: 22px;
             color: #00d4ff;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 16px;
         }
-
         .location-select {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
-
         .location-select label {
             display: block;
-            font-size: 18px;
-            color: #ccc;
+            font-size: 20px;
+            color: #ddd;
             margin-bottom: 8px;
         }
-
         .location-select select {
             width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.4);
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(0,0,0,0.5);
             color: #fff;
-            font-size: 18px;
+            font-size: 20px;
             outline: none;
-            cursor: pointer;
         }
-
         .location-select select option {
             background: #1a1a2e;
+            color: #fff;
         }
 
         .nav-btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: linear-gradient(135deg, #00d4ff, #0099cc);
             border: none;
             border-radius: 14px;
             color: #000;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-top: 8px;
         }
-
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
-        }
-
         .clear-btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: #ccc;
-            font-size: 18px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 14px;
+            color: #ddd;
+            font-size: 20px;
             cursor: pointer;
             margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .clear-btn:hover {
-            border-color: #ff6b6b;
-            color: #ff6b6b;
         }
 
         .route-info {
             background: rgba(0, 212, 255, 0.1);
-            border-radius: 14px;
-            padding: 15px;
+            border-radius: 16px;
+            padding: 18px;
             border-left: 4px solid #00d4ff;
             display: none;
-            font-size: 16px;
-        }
-
-        .route-info.show {
-            display: block;
-        }
-
-        .route-info h4 {
             font-size: 20px;
+        }
+        .route-info.show { display: block; }
+        .route-info h4 {
+            font-size: 24px;
             color: #00d4ff;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
-
-        .route-steps {
-            line-height: 1.8;
-            color: #ddd;
-            font-size: 16px;
-        }
-
-        .route-steps .step {
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
+        .route-steps { line-height: 1.8; color: #eee; }
         .distance-badge {
             display: inline-block;
             background: #00d4ff;
             color: #000;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 16px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 18px;
             font-weight: bold;
-            margin-left: 5px;
+            margin-left: 6px;
         }
 
-        .legend {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .legend h4 {
-            font-size: 18px;
-            color: #ccc;
-            margin-bottom: 12px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-        }
-
-        /* 语音播报按钮 */
         .voice-btn {
-            background: rgba(0, 212, 255, 0.15);
-            border: 1px solid #00d4ff;
+            background: rgba(0,212,255,0.2);
+            border: 2px solid #00d4ff;
             color: #00d4ff;
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 20px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            margin-left: 10px;
-            transition: all 0.2s;
+            transition: 0.2s;
+        }
+        .voice-btn:hover { background: rgba(0,212,255,0.35); }
+
+        .legend {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+        .legend h4 { font-size: 20px; color: #ccc; margin-bottom: 12px; }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .legend-color {
+            width: 22px; height: 22px;
+            border-radius: 6px;
         }
 
-        .voice-btn:hover {
-            background: rgba(0, 212, 255, 0.3);
-        }
-
-        /* 主视图 */
+        /* 右侧主视图 */
         .main-view {
             flex: 1;
             position: relative;
             overflow: hidden;
+            background: #0a0a1a;
         }
-
         .floor-label {
             position: absolute;
-            top: 80px; /* 为返回按钮留空 */
-            left: 20px;
-            background: rgba(0, 0, 0, 0.6);
+            top: 80px; left: 20px;
+            background: rgba(0,0,0,0.65);
             backdrop-filter: blur(10px);
-            padding: 14px 24px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 28px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
             z-index: 10;
         }
-
         .floor-label h2 {
-            font-size: 24px;
+            font-size: 28px;
             color: #00d4ff;
         }
-
         .floor-label p {
-            font-size: 18px;
-            color: #aaa;
-            margin-top: 2px;
+            font-size: 20px;
+            color: #bbb;
+            margin-top: 4px;
         }
 
         .map-container {
@@ -333,37 +262,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 20px;
         }
-
         .map-svg {
             max-width: 100%;
             max-height: 100%;
-            filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.1));
         }
 
-        .room-hover {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .room-hover:hover {
-            filter: brightness(1.3);
-        }
+        /* SVG 房间悬浮效果 */
+        .room-hover { cursor: pointer; transition: filter 0.3s; }
+        .room-hover:hover { filter: brightness(1.3); }
 
         .path-line {
             stroke-dasharray: 8 4;
             animation: dash 1s linear infinite;
         }
-
-        @keyframes dash {
-            to { stroke-dashoffset: -20; }
-        }
+        @keyframes dash { to { stroke-dashoffset: -20; } }
 
         .marker-pulse {
             animation: pulse 1.5s ease-in-out infinite;
         }
-
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -371,36 +289,21 @@
 
         .tooltip {
             position: fixed;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0,0,0,0.9);
             color: #fff;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 18px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 20px;
             pointer-events: none;
             z-index: 1000;
             display: none;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-        }
-
-        .room-label {
-            font-size: 14px;
-            fill: #fff;
-            text-anchor: middle;
-            pointer-events: none;
-            font-weight: 500;
-        }
-
-        .room-label-small {
-            font-size: 12px;
-            fill: #ccc;
-            text-anchor: middle;
-            pointer-events: none;
+            border: 1px solid rgba(0,212,255,0.4);
         }
     </style>
 </head>
 <body>
-    <!-- 返回按钮 -->
-    <a href="../index.html" class="back-btn">←</a>
+    <!-- 返回主页按钮 -->
+    <a href="../index.html" class="back-btn" title="返回首页">←</a>
 
     <div class="tooltip" id="tooltip"></div>
 
@@ -408,59 +311,59 @@
         <!-- 侧边栏 -->
         <div class="sidebar">
             <div class="logo">
-                <h1>🏥 智慧医院导航</h1>
-                <p>语音指引 · 大字体适老</p>
+                <h1>🏥 院内实时导航</h1>
+                <p>大字指引 · 语音播报</p>
             </div>
 
             <!-- 楼层选择 -->
-            <div class="floor-selector">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div class="floor-btn active" data-floor="1" onclick="switchFloor(1)">
                     <div class="floor-icon">1F</div>
                     <div>
-                        <div style="font-weight: bold; font-size: 18px;">一层 · 门诊大厅</div>
-                        <div style="font-size: 16px; color: #aaa;">挂号 / 收费 / 药房 / 急诊</div>
+                        <div style="font-weight:bold;font-size:22px;">一层 · 门诊大厅</div>
+                        <div style="font-size:18px;color:#aaa;">挂号 / 药房 / 急诊</div>
                     </div>
                 </div>
                 <div class="floor-btn" data-floor="2" onclick="switchFloor(2)">
                     <div class="floor-icon">2F</div>
                     <div>
-                        <div style="font-weight: bold; font-size: 18px;">二层 · 诊疗科室</div>
-                        <div style="font-size: 16px; color: #aaa;">内科 / 外科 / 检验 / 影像</div>
+                        <div style="font-weight:bold;font-size:22px;">二层 · 诊疗科室</div>
+                        <div style="font-size:18px;color:#aaa;">内科 / 外科 / 检验</div>
                     </div>
                 </div>
                 <div class="floor-btn" data-floor="3" onclick="switchFloor(3)">
                     <div class="floor-icon">3F</div>
                     <div>
-                        <div style="font-weight: bold; font-size: 18px;">三层 · 住院部</div>
-                        <div style="font-size: 16px; color: #aaa;">病房 / 护士站 / 手术室</div>
+                        <div style="font-weight:bold;font-size:22px;">三层 · 住院部</div>
+                        <div style="font-size:18px;color:#aaa;">病房 / 手术室 / ICU</div>
                     </div>
                 </div>
             </div>
 
             <!-- 导航面板 -->
             <div class="nav-panel">
-                <h3>📍 路径导航</h3>
+                <h3>📍 路径规划</h3>
                 <div class="location-select">
-                    <label>起点位置</label>
+                    <label>我在哪里？</label>
                     <select id="startPoint">
-                        <option value="">请选择起点...</option>
+                        <option value="">请选择起点…</option>
                     </select>
                 </div>
                 <div class="location-select">
-                    <label>终点位置</label>
+                    <label>我要去哪里？</label>
                     <select id="endPoint">
-                        <option value="">请选择终点...</option>
+                        <option value="">请选择终点…</option>
                     </select>
                 </div>
                 <button class="nav-btn" onclick="startNavigation()">🚀 开始导航</button>
-                <button class="clear-btn" onclick="clearNavigation()">清除路线</button>
+                <button class="clear-btn" onclick="clearNavigation()">✖ 清除路线</button>
             </div>
 
-            <!-- 路径信息 -->
+            <!-- 路径信息（含语音播报） -->
             <div class="route-info" id="routeInfo">
                 <h4>
                     📋 导航路线
-                    <button class="voice-btn" onclick="speakNavigation()" title="语音播报路线">🔊 播报</button>
+                    <button class="voice-btn" onclick="speakNavigation()">🔊 语音播报</button>
                 </h4>
                 <div class="route-steps" id="routeSteps"></div>
             </div>
@@ -468,133 +371,85 @@
             <!-- 图例 -->
             <div class="legend">
                 <h4>图例说明</h4>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #4CAF50;"></div>
-                    <span>门诊 / 诊室</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #2196F3;"></div>
-                    <span>药房 / 收费</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #FF9800;"></div>
-                    <span>检查 / 检验</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #9C27B0;"></div>
-                    <span>住院 / 病房</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #f44336;"></div>
-                    <span>急诊 / 抢救</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #607D8B;"></div>
-                    <span>楼梯 / 电梯</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background: #00d4ff;"></div>
-                    <span>导航路线</span>
-                </div>
+                <div class="legend-item"><div class="legend-color" style="background:#4CAF50;"></div> 门诊 / 诊室</div>
+                <div class="legend-item"><div class="legend-color" style="background:#2196F3;"></div> 药房 / 收费</div>
+                <div class="legend-item"><div class="legend-color" style="background:#FF9800;"></div> 检查 / 检验</div>
+                <div class="legend-item"><div class="legend-color" style="background:#9C27B0;"></div> 住院 / 病房</div>
+                <div class="legend-item"><div class="legend-color" style="background:#f44336;"></div> 急诊 / 抢救</div>
+                <div class="legend-item"><div class="legend-color" style="background:#607D8B;"></div> 楼梯 / 电梯</div>
+                <div class="legend-item"><div class="legend-color" style="background:#00d4ff;"></div> 导航路线</div>
             </div>
         </div>
 
-        <!-- 主视图 -->
+        <!-- 右侧地图主视图 -->
         <div class="main-view">
             <div class="floor-label">
                 <h2 id="floorTitle">一层 · 门诊大厅</h2>
                 <p id="floorDesc">挂号收费 / 中西药房 / 急诊中心</p>
             </div>
-            <div class="map-container" id="mapContainer"></div>
+            <div class="map-container" id="mapContainer">
+                <!-- 地图由JS动态生成 -->
+            </div>
         </div>
     </div>
 
     <script>
-        // ==================== 医院地图数据 ====================
+        // ==================== 医院数据及逻辑 ====================
         const hospitalData = {
             floors: {
                 1: {
                     name: "一层 · 门诊大厅",
                     desc: "挂号收费 / 中西药房 / 急诊中心",
                     rooms: [
-                        { id: "entrance", name: "医院正门入口", x: 400, y: 520, w: 120, h: 60, type: "entrance", color: "#4CAF50" },
+                        { id: "entrance", name: "医院大门", x: 400, y: 520, w: 120, h: 60, type: "entrance", color: "#4CAF50" },
                         { id: "reception", name: "导诊台", x: 360, y: 420, w: 80, h: 60, type: "service", color: "#2196F3" },
-                        { id: "register", name: "挂号收费处", x: 200, y: 420, w: 100, h: 60, type: "service", color: "#2196F3" },
+                        { id: "register", name: "挂号收费", x: 200, y: 420, w: 100, h: 60, type: "service", color: "#2196F3" },
                         { id: "pharmacy_w", name: "西药房", x: 520, y: 420, w: 100, h: 60, type: "pharmacy", color: "#2196F3" },
                         { id: "pharmacy_c", name: "中药房", x: 640, y: 420, w: 100, h: 60, type: "pharmacy", color: "#2196F3" },
                         { id: "emergency", name: "急诊中心", x: 80, y: 200, w: 140, h: 120, type: "emergency", color: "#f44336" },
                         { id: "triage", name: "急诊分诊", x: 80, y: 340, w: 100, h: 50, type: "emergency", color: "#f44336" },
                         { id: "lab_blood", name: "采血中心", x: 600, y: 200, w: 100, h: 80, type: "lab", color: "#FF9800" },
-                        { id: "radiology", name: "放射科登记", x: 720, y: 200, w: 100, h: 80, type: "lab", color: "#FF9800" },
+                        { id: "radiology", name: "放射登记", x: 720, y: 200, w: 100, h: 80, type: "lab", color: "#FF9800" },
                         { id: "waiting", name: "候诊大厅", x: 280, y: 280, w: 240, h: 100, type: "waiting", color: "#E8EAF6", textColor: "#333" },
-                        { id: "wc1", name: "洗手间", x: 80, y: 420, w: 60, h: 50, type: "wc", color: "#607D8B" },
-                        { id: "wc2", name: "洗手间", x: 760, y: 420, w: 60, h: 50, type: "wc", color: "#607D8B" },
-                        { id: "elevator1", name: "电梯厅", x: 380, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
+                        { id: "elevator1", name: "电梯", x: 380, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
                         { id: "stairs1", name: "楼梯", x: 460, y: 160, w: 50, h: 60, type: "stairs", color: "#607D8B" },
-                        { id: "shop", name: "便民超市", x: 720, y: 340, w: 100, h: 50, type: "shop", color: "#795548" },
+                        { id: "shop", name: "便利店", x: 720, y: 340, w: 100, h: 50, type: "shop", color: "#795548" },
                     ],
                     corridors: [
                         { x1: 140, y1: 380, x2: 760, y2: 380, w: 40 },
-                        { x1: 140, y1: 160, x2: 140, y2: 380, w: 30 },
-                        { x1: 760, y1: 160, x2: 760, y2: 380, w: 30 },
                         { x1: 420, y1: 380, x2: 420, y2: 520, w: 30 },
                     ]
                 },
                 2: {
                     name: "二层 · 诊疗科室",
-                    desc: "内科 / 外科 / 检验科 / 影像中心",
+                    desc: "内科 / 外科 / 检验科",
                     rooms: [
-                        { id: "internal", name: "内科诊室", x: 80, y: 200, w: 120, h: 100, type: "clinic", color: "#4CAF50" },
-                        { id: "surgery", name: "外科诊室", x: 220, y: 200, w: 120, h: 100, type: "clinic", color: "#4CAF50" },
-                        { id: "pediatrics", name: "儿科诊室", x: 80, y: 320, w: 100, h: 80, type: "clinic", color: "#4CAF50" },
-                        { id: "ent", name: "耳鼻喉科", x: 200, y: 320, w: 100, h: 80, type: "clinic", color: "#4CAF50" },
-                        { id: "dermatology", name: "皮肤科", x: 320, y: 320, w: 100, h: 80, type: "clinic", color: "#4CAF50" },
+                        { id: "internal", name: "内科", x: 80, y: 200, w: 120, h: 100, type: "clinic", color: "#4CAF50" },
+                        { id: "surgery", name: "外科", x: 220, y: 200, w: 120, h: 100, type: "clinic", color: "#4CAF50" },
+                        { id: "pediatrics", name: "儿科", x: 80, y: 320, w: 100, h: 80, type: "clinic", color: "#4CAF50" },
                         { id: "lab_test", name: "检验科", x: 560, y: 200, w: 120, h: 100, type: "lab", color: "#FF9800" },
                         { id: "ultrasound", name: "超声科", x: 700, y: 200, w: 120, h: 100, type: "lab", color: "#FF9800" },
                         { id: "ct", name: "CT室", x: 560, y: 320, w: 100, h: 80, type: "lab", color: "#FF9800" },
-                        { id: "mri", name: "MRI室", x: 680, y: 320, w: 100, h: 80, type: "lab", color: "#FF9800" },
-                        { id: "nurse_station2", name: "护士站", x: 380, y: 420, w: 80, h: 60, type: "service", color: "#2196F3" },
                         { id: "waiting2", name: "候诊区", x: 320, y: 200, w: 200, h: 100, type: "waiting", color: "#E8EAF6", textColor: "#333" },
-                        { id: "wc3", name: "洗手间", x: 80, y: 420, w: 60, h: 50, type: "wc", color: "#607D8B" },
-                        { id: "wc4", name: "洗手间", x: 760, y: 420, w: 60, h: 50, type: "wc", color: "#607D8B" },
-                        { id: "elevator2", name: "电梯厅", x: 380, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
-                        { id: "stairs2", name: "楼梯", x: 460, y: 160, w: 50, h: 60, type: "stairs", color: "#607D8B" },
-                        { id: "pay2", name: "收费处", x: 200, y: 420, w: 80, h: 60, type: "service", color: "#2196F3" },
+                        { id: "elevator2", name: "电梯", x: 380, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
                     ],
                     corridors: [
                         { x1: 140, y1: 380, x2: 760, y2: 380, w: 40 },
-                        { x1: 140, y1: 160, x2: 140, y2: 380, w: 30 },
-                        { x1: 760, y1: 160, x2: 760, y2: 380, w: 30 },
-                        { x1: 420, y1: 380, x2: 420, y2: 520, w: 30 },
                     ]
                 },
                 3: {
                     name: "三层 · 住院部",
-                    desc: "病房区 / 护士站 / 手术室 / ICU",
+                    desc: "病房 / 护士站 / ICU",
                     rooms: [
                         { id: "ward_a", name: "A区病房", x: 80, y: 180, w: 140, h: 120, type: "ward", color: "#9C27B0" },
                         { id: "ward_b", name: "B区病房", x: 240, y: 180, w: 140, h: 120, type: "ward", color: "#9C27B0" },
-                        { id: "ward_c", name: "C区病房", x: 80, y: 320, w: 140, h: 100, type: "ward", color: "#9C27B0" },
-                        { id: "ward_d", name: "D区病房", x: 240, y: 320, w: 140, h: 100, type: "ward", color: "#9C27B0" },
                         { id: "nurse_station3", name: "护士站", x: 420, y: 240, w: 100, h: 80, type: "service", color: "#2196F3" },
-                        { id: "doctor_office", name: "医生办公室", x: 420, y: 340, w: 100, h: 60, type: "service", color: "#2196F3" },
-                        { id: "or1", name: "手术室1", x: 600, y: 180, w: 100, h: 80, type: "or", color: "#f44336" },
-                        { id: "or2", name: "手术室2", x: 720, y: 180, w: 100, h: 80, type: "or", color: "#f44336" },
-                        { id: "or3", name: "手术室3", x: 600, y: 280, w: 100, h: 80, type: "or", color: "#f44336" },
-                        { id: "icu", name: "ICU重症监护", x: 720, y: 280, w: 100, h: 80, type: "icu", color: "#f44336" },
-                        { id: "recovery", name: "恢复室", x: 660, y: 380, w: 100, h: 60, type: "ward", color: "#9C27B0" },
-                        { id: "pharmacy_ip", name: "住院药房", x: 420, y: 420, w: 100, h: 60, type: "pharmacy", color: "#2196F3" },
-                        { id: "wc5", name: "洗手间", x: 80, y: 440, w: 60, h: 50, type: "wc", color: "#607D8B" },
-                        { id: "wc6", name: "洗手间", x: 760, y: 440, w: 60, h: 50, type: "wc", color: "#607D8B" },
-                        { id: "elevator3", name: "电梯厅", x: 420, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
-                        { id: "stairs3", name: "楼梯", x: 500, y: 160, w: 50, h: 60, type: "stairs", color: "#607D8B" },
-                        { id: "pantry", name: "配餐间", x: 560, y: 420, w: 80, h: 60, type: "service", color: "#795548" },
+                        { id: "or1", name: "手术室", x: 600, y: 180, w: 100, h: 80, type: "or", color: "#f44336" },
+                        { id: "icu", name: "ICU", x: 720, y: 180, w: 100, h: 80, type: "icu", color: "#f44336" },
+                        { id: "elevator3", name: "电梯", x: 420, y: 160, w: 60, h: 60, type: "elevator", color: "#607D8B" },
                     ],
                     corridors: [
                         { x1: 140, y1: 400, x2: 760, y2: 400, w: 40 },
-                        { x1: 140, y1: 160, x2: 140, y2: 400, w: 30 },
-                        { x1: 760, y1: 160, x2: 760, y2: 400, w: 30 },
-                        { x1: 460, y1: 400, x2: 460, y2: 520, w: 30 },
                     ]
                 }
             }
@@ -602,74 +457,35 @@
 
         const connectionPoints = {
             1: {
-                "entrance": { x: 420, y: 490 },
-                "reception": { x: 400, y: 400 },
-                "register": { x: 250, y: 400 },
-                "pharmacy_w": { x: 570, y: 400 },
-                "pharmacy_c": { x: 690, y: 400 },
-                "emergency": { x: 150, y: 260 },
-                "triage": { x: 130, y: 365 },
-                "lab_blood": { x: 650, y: 240 },
-                "radiology": { x: 770, y: 240 },
-                "waiting": { x: 400, y: 330 },
-                "wc1": { x: 110, y: 445 },
-                "wc2": { x: 790, y: 445 },
+                "entrance": { x: 420, y: 490 }, "reception": { x: 400, y: 400 },
+                "register": { x: 250, y: 400 }, "pharmacy_w": { x: 570, y: 400 },
+                "emergency": { x: 150, y: 260 }, "lab_blood": { x: 650, y: 240 },
+                "radiology": { x: 770, y: 240 }, "waiting": { x: 400, y: 330 },
                 "elevator1": { x: 410, y: 190 },
-                "stairs1": { x: 485, y: 190 },
-                "shop": { x: 770, y: 365 },
             },
             2: {
-                "internal": { x: 140, y: 250 },
-                "surgery": { x: 280, y: 250 },
-                "pediatrics": { x: 130, y: 360 },
-                "ent": { x: 250, y: 360 },
-                "dermatology": { x: 370, y: 360 },
-                "lab_test": { x: 620, y: 250 },
-                "ultrasound": { x: 760, y: 250 },
-                "ct": { x: 610, y: 360 },
-                "mri": { x: 730, y: 360 },
-                "nurse_station2": { x: 420, y: 400 },
-                "waiting2": { x: 420, y: 250 },
-                "wc3": { x: 110, y: 445 },
-                "wc4": { x: 790, y: 445 },
-                "elevator2": { x: 410, y: 190 },
-                "stairs2": { x: 485, y: 190 },
-                "pay2": { x: 240, y: 400 },
+                "internal": { x: 140, y: 250 }, "surgery": { x: 280, y: 250 },
+                "pediatrics": { x: 130, y: 360 }, "lab_test": { x: 620, y: 250 },
+                "ultrasound": { x: 760, y: 250 }, "ct": { x: 610, y: 360 },
+                "waiting2": { x: 420, y: 250 }, "elevator2": { x: 410, y: 190 },
             },
             3: {
-                "ward_a": { x: 150, y: 240 },
-                "ward_b": { x: 310, y: 240 },
-                "ward_c": { x: 150, y: 370 },
-                "ward_d": { x: 310, y: 370 },
-                "nurse_station3": { x: 470, y: 280 },
-                "doctor_office": { x: 470, y: 370 },
-                "or1": { x: 650, y: 220 },
-                "or2": { x: 770, y: 220 },
-                "or3": { x: 650, y: 320 },
-                "icu": { x: 770, y: 320 },
-                "recovery": { x: 710, y: 410 },
-                "pharmacy_ip": { x: 470, y: 450 },
-                "wc5": { x: 110, y: 465 },
-                "wc6": { x: 790, y: 465 },
-                "elevator3": { x: 450, y: 190 },
-                "stairs3": { x: 525, y: 190 },
-                "pantry": { x: 600, y: 450 },
+                "ward_a": { x: 150, y: 240 }, "ward_b": { x: 310, y: 240 },
+                "nurse_station3": { x: 470, y: 280 }, "or1": { x: 650, y: 220 },
+                "icu": { x: 770, y: 220 }, "elevator3": { x: 450, y: 190 },
             }
         };
 
         const floorConnections = {
             "elevator": { 1: "elevator1", 2: "elevator2", 3: "elevator3" },
-            "stairs": { 1: "stairs1", 2: "stairs2", 3: "stairs3" }
         };
 
         let currentFloor = 1;
         let navigationPath = [];
         let startRoom = null;
         let endRoom = null;
-        // 导航路线文本（用于语音播报）
         let routeDescription = '';
 
-        // ==================== 初始化 ====================
         function init() {
             populateLocationSelects();
             renderMap(1);
@@ -678,8 +494,8 @@
         function populateLocationSelects() {
             const startSelect = document.getElementById('startPoint');
             const endSelect = document.getElementById('endPoint');
-            startSelect.innerHTML = '<option value="">请选择起点...</option>';
-            endSelect.innerHTML = '<option value="">请选择终点...</option>';
+            startSelect.innerHTML = '<option value="">请选择起点…</option>';
+            endSelect.innerHTML = '<option value="">请选择终点…</option>';
 
             for (let floor = 1; floor <= 3; floor++) {
                 const floorData = hospitalData.floors[floor];
@@ -689,7 +505,6 @@
                 optgroupEnd.label = floorData.name;
 
                 floorData.rooms.forEach(room => {
-                    if (room.type === 'wc') return;
                     const optionStart = document.createElement('option');
                     optionStart.value = `${floor}-${room.id}`;
                     optionStart.textContent = room.name;
@@ -700,13 +515,11 @@
                     optionEnd.textContent = room.name;
                     optgroupEnd.appendChild(optionEnd);
                 });
-
                 startSelect.appendChild(optgroupStart);
                 endSelect.appendChild(optgroupEnd);
             }
         }
 
-        // ==================== 地图渲染 ====================
         function renderMap(floor) {
             const container = document.getElementById('mapContainer');
             const floorData = hospitalData.floors[floor];
@@ -714,18 +527,19 @@
             svg += `<rect x="0" y="0" width="900" height="600" fill="#0a0a1a" rx="15"/>`;
             svg += `<rect x="20" y="20" width="860" height="560" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="2" rx="10"/>`;
 
+            // 走廊
             floorData.corridors.forEach(corr => {
                 svg += `<rect x="${corr.x1 - corr.w/2}" y="${corr.y1 - corr.w/2}" 
                         width="${Math.abs(corr.x2 - corr.x1) + corr.w}" height="${Math.abs(corr.y2 - corr.y1) + corr.w}" 
-                        fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
+                        fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>`;
             });
 
+            // 房间
             floorData.rooms.forEach(room => {
                 const isStart = startRoom && startRoom.floor === floor && startRoom.id === room.id;
                 const isEnd = endRoom && endRoom.floor === floor && endRoom.id === room.id;
                 const isOnPath = navigationPath.some(p => p.floor === floor && p.roomId === room.id);
 
-                let fillColor = room.color;
                 let strokeColor = "rgba(255,255,255,0.2)";
                 let strokeWidth = 1;
                 if (isStart) { strokeColor = "#00ff00"; strokeWidth = 3; }
@@ -733,73 +547,44 @@
                 else if (isOnPath) { strokeColor = "#00d4ff"; strokeWidth = 2; }
 
                 svg += `<rect class="room-hover" x="${room.x}" y="${room.y}" width="${room.w}" height="${room.h}" 
-                        fill="${fillColor}" fill-opacity="0.3" stroke="${strokeColor}" stroke-width="${strokeWidth}" rx="6"
+                        fill="${room.color}" fill-opacity="0.25" stroke="${strokeColor}" stroke-width="${strokeWidth}" rx="6"
                         onmouseenter="showTooltip(event, '${room.name}')" onmouseleave="hideTooltip()"
                         onclick="selectRoom('${floor}', '${room.id}')"/>`;
 
                 const cx = room.x + room.w/2;
                 const cy = room.y + room.h/2;
-                const textColor = room.textColor || '#fff';
-                if (room.w > 80) {
-                    svg += `<text class="room-label" x="${cx}" y="${cy - 5}" fill="${textColor}">${room.name}</text>`;
-                } else {
-                    svg += `<text class="room-label-small" x="${cx}" y="${cy + 3}" fill="${textColor}">${room.name}</text>`;
-                }
+                const labelColor = room.textColor || '#fff';
+                svg += `<text class="room-label" x="${cx}" y="${cy}" fill="${labelColor}" font-size="16" text-anchor="middle" dominant-baseline="middle">${room.name}</text>`;
 
-                if (isStart) {
-                    svg += `<circle cx="${cx}" cy="${room.y - 10}" r="8" fill="#00ff00" class="marker-pulse"/>`;
-                    svg += `<text x="${cx}" y="${room.y - 6}" text-anchor="middle" fill="#000" font-size="10" font-weight="bold">起</text>`;
-                }
-                if (isEnd) {
-                    svg += `<circle cx="${cx}" cy="${room.y - 10}" r="8" fill="#ff0000" class="marker-pulse"/>`;
-                    svg += `<text x="${cx}" y="${room.y - 6}" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">终</text>`;
-                }
+                if (isStart) svg += `<circle cx="${cx}" cy="${room.y - 8}" r="8" fill="#00ff00"/>`;
+                if (isEnd) svg += `<circle cx="${cx}" cy="${room.y - 8}" r="8" fill="#ff0000"/>`;
             });
 
+            // 路径
             if (navigationPath.length > 0) {
                 const floorPath = navigationPath.filter(p => p.floor === floor);
                 if (floorPath.length > 1) {
-                    let pathD = `M ${floorPath[0].x} ${floorPath[0].y}`;
-                    for (let i = 1; i < floorPath.length; i++) {
-                        pathD += ` L ${floorPath[i].x} ${floorPath[i].y}`;
-                    }
-                    svg += `<path d="${pathD}" fill="none" stroke="#00d4ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="path-line"/>`;
-                    for (let i = 1; i < floorPath.length; i++) {
-                        const prev = floorPath[i-1];
-                        const curr = floorPath[i];
-                        const midX = (prev.x + curr.x) / 2;
-                        const midY = (prev.y + curr.y) / 2;
-                        const angle = Math.atan2(curr.y - prev.y, curr.x - prev.x);
-                        const arrowSize = 8;
-                        const ax1 = midX - arrowSize * Math.cos(angle - 0.5);
-                        const ay1 = midY - arrowSize * Math.sin(angle - 0.5);
-                        const ax2 = midX - arrowSize * Math.cos(angle + 0.5);
-                        const ay2 = midY - arrowSize * Math.sin(angle + 0.5);
-                        svg += `<polygon points="${midX},${midY} ${ax1},${ay1} ${ax2},${ay2}" fill="#00d4ff"/>`;
-                    }
+                    let d = `M ${floorPath[0].x} ${floorPath[0].y}`;
+                    for (let i = 1; i < floorPath.length; i++) d += ` L ${floorPath[i].x} ${floorPath[i].y}`;
+                    svg += `<path d="${d}" fill="none" stroke="#00d4ff" stroke-width="4" class="path-line"/>`;
                 }
             }
-            svg += `<text x="850" y="580" text-anchor="end" fill="rgba(255,255,255,0.3)" font-size="14">${floor}F</text>`;
+
             svg += `</svg>`;
             container.innerHTML = svg;
         }
 
-        // ==================== 交互功能 ====================
         function switchFloor(floor) {
             currentFloor = floor;
-            document.querySelectorAll('.floor-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (parseInt(btn.dataset.floor) === floor) btn.classList.add('active');
-            });
-            const floorData = hospitalData.floors[floor];
-            document.getElementById('floorTitle').textContent = floorData.name;
-            document.getElementById('floorDesc').textContent = floorData.desc;
+            document.querySelectorAll('.floor-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.floor-btn[data-floor="${floor}"]`).classList.add('active');
+            const fd = hospitalData.floors[floor];
+            document.getElementById('floorTitle').textContent = fd.name;
+            document.getElementById('floorDesc').textContent = fd.desc;
             renderMap(floor);
         }
 
         function selectRoom(floor, roomId) {
-            const room = hospitalData.floors[floor].rooms.find(r => r.id === roomId);
-            if (!room) return;
             if (!startRoom) {
                 document.getElementById('startPoint').value = `${floor}-${roomId}`;
                 startRoom = { floor, id: roomId };
@@ -808,6 +593,7 @@
                 endRoom = { floor, id: roomId };
                 startNavigation();
             } else {
+                // 重新选择
                 startRoom = { floor, id: roomId };
                 endRoom = null;
                 document.getElementById('startPoint').value = `${floor}-${roomId}`;
@@ -818,116 +604,99 @@
             renderMap(currentFloor);
         }
 
-        function showTooltip(event, text) {
-            const tooltip = document.getElementById('tooltip');
-            tooltip.textContent = text;
-            tooltip.style.display = 'block';
-            tooltip.style.left = event.clientX + 15 + 'px';
-            tooltip.style.top = event.clientY + 15 + 'px';
+        function showTooltip(e, text) {
+            const t = document.getElementById('tooltip');
+            t.textContent = text;
+            t.style.display = 'block';
+            t.style.left = e.clientX + 15 + 'px';
+            t.style.top = e.clientY + 15 + 'px';
         }
+        function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
 
-        function hideTooltip() {
-            document.getElementById('tooltip').style.display = 'none';
-        }
-
-        // ==================== 路径规划 ====================
         function startNavigation() {
-            const startVal = document.getElementById('startPoint').value;
-            const endVal = document.getElementById('endPoint').value;
-            if (!startVal || !endVal) {
-                alert('请选择起点和终点！');
-                return;
-            }
-            const [startFloor, startId] = startVal.split('-');
-            const [endFloor, endId] = endVal.split('-');
-            startRoom = { floor: parseInt(startFloor), id: startId };
-            endRoom = { floor: parseInt(endFloor), id: endId };
+            const sv = document.getElementById('startPoint').value;
+            const ev = document.getElementById('endPoint').value;
+            if (!sv || !ev) { alert('请选择起点和终点'); return; }
+            const [sf, si] = sv.split('-');
+            const [ef, ei] = ev.split('-');
+            startRoom = { floor: +sf, id: si };
+            endRoom = { floor: +ef, id: ei };
             navigationPath = calculatePath(startRoom, endRoom);
             displayRouteInfo();
-            // 自动切换到起点所在楼层
-            switchFloor(startRoom.floor);
-            // 震动反馈
             if (navigator.vibrate) navigator.vibrate(30);
+            switchFloor(startRoom.floor);
         }
 
         function calculatePath(start, end) {
             const path = [];
+            const startPt = connectionPoints[start.floor]?.[start.id];
+            const endPt = connectionPoints[end.floor]?.[end.id];
+            if (!startPt || !endPt) return path;
+
             if (start.floor === end.floor) {
-                const points = connectionPoints[start.floor];
-                const startPt = points[start.id];
-                const endPt = points[end.id];
-                if (startPt && endPt) {
-                    const cy = start.floor === 3 ? 400 : 380;
-                    path.push({ floor: start.floor, roomId: start.id, x: startPt.x, y: startPt.y });
-                    if (Math.abs(startPt.y - cy) > 20) path.push({ floor: start.floor, roomId: 'corridor', x: startPt.x, y: cy });
-                    if (Math.abs(startPt.x - endPt.x) > 20) path.push({ floor: start.floor, roomId: 'corridor', x: endPt.x, y: cy });
-                    if (Math.abs(endPt.y - cy) > 20) path.push({ floor: start.floor, roomId: 'corridor', x: endPt.x, y: endPt.y });
-                    path.push({ floor: start.floor, roomId: end.id, x: endPt.x, y: endPt.y });
-                }
+                const cy = start.floor === 3 ? 400 : 380;
+                path.push({ floor: start.floor, roomId: start.id, x: startPt.x, y: startPt.y });
+                if (Math.abs(startPt.y - cy) > 20) path.push({ floor: start.floor, x: startPt.x, y: cy });
+                if (Math.abs(startPt.x - endPt.x) > 20) path.push({ floor: start.floor, x: endPt.x, y: cy });
+                if (Math.abs(endPt.y - cy) > 20) path.push({ floor: start.floor, x: endPt.x, y: endPt.y });
+                path.push({ floor: start.floor, roomId: end.id, x: endPt.x, y: endPt.y });
             } else {
-                const startPt = connectionPoints[start.floor][start.id];
-                const elevatorStart = connectionPoints[start.floor][floorConnections.elevator[start.floor]];
-                const elevatorEnd = connectionPoints[end.floor][floorConnections.elevator[end.floor]];
-                const endPt = connectionPoints[end.floor][end.id];
-                if (startPt && elevatorStart && elevatorEnd && endPt) {
-                    const cy1 = start.floor === 3 ? 400 : 380;
-                    const cy2 = end.floor === 3 ? 400 : 380;
-                    path.push({ floor: start.floor, roomId: start.id, x: startPt.x, y: startPt.y });
-                    if (Math.abs(startPt.y - cy1) > 20) path.push({ floor: start.floor, roomId: 'corridor', x: startPt.x, y: cy1 });
-                    path.push({ floor: start.floor, roomId: 'corridor', x: elevatorStart.x, y: cy1 });
-                    path.push({ floor: start.floor, roomId: floorConnections.elevator[start.floor], x: elevatorStart.x, y: elevatorStart.y });
-                    path.push({ floor: end.floor, roomId: floorConnections.elevator[end.floor], x: elevatorEnd.x, y: elevatorEnd.y });
-                    if (Math.abs(elevatorEnd.y - cy2) > 20) path.push({ floor: end.floor, roomId: 'corridor', x: elevatorEnd.x, y: cy2 });
-                    if (Math.abs(elevatorEnd.x - endPt.x) > 20) path.push({ floor: end.floor, roomId: 'corridor', x: endPt.x, y: cy2 });
-                    if (Math.abs(endPt.y - cy2) > 20) path.push({ floor: end.floor, roomId: 'corridor', x: endPt.x, y: endPt.y });
-                    path.push({ floor: end.floor, roomId: end.id, x: endPt.x, y: endPt.y });
-                }
+                const elevStartKey = floorConnections.elevator[start.floor];
+                const elevEndKey = floorConnections.elevator[end.floor];
+                const elevStart = connectionPoints[start.floor]?.[elevStartKey];
+                const elevEnd = connectionPoints[end.floor]?.[elevEndKey];
+                if (!elevStart || !elevEnd) return path;
+                const cy1 = start.floor === 3 ? 400 : 380;
+                const cy2 = end.floor === 3 ? 400 : 380;
+
+                path.push({ floor: start.floor, roomId: start.id, x: startPt.x, y: startPt.y });
+                path.push({ floor: start.floor, x: startPt.x, y: cy1 });
+                path.push({ floor: start.floor, x: elevStart.x, y: cy1 });
+                path.push({ floor: start.floor, roomId: elevStartKey, x: elevStart.x, y: elevStart.y });
+                path.push({ floor: end.floor, roomId: elevEndKey, x: elevEnd.x, y: elevEnd.y });
+                path.push({ floor: end.floor, x: elevEnd.x, y: cy2 });
+                path.push({ floor: end.floor, x: endPt.x, y: cy2 });
+                path.push({ floor: end.floor, x: endPt.x, y: endPt.y });
+                path.push({ floor: end.floor, roomId: end.id, x: endPt.x, y: endPt.y });
             }
             return path;
         }
 
         function displayRouteInfo() {
-            const routeInfo = document.getElementById('routeInfo');
-            const routeSteps = document.getElementById('routeSteps');
+            const info = document.getElementById('routeInfo');
+            const stepsDiv = document.getElementById('routeSteps');
             if (!startRoom || !endRoom) return;
-            const startRoomData = hospitalData.floors[startRoom.floor].rooms.find(r => r.id === startRoom.id);
-            const endRoomData = hospitalData.floors[endRoom.floor].rooms.find(r => r.id === endRoom.id);
-            let steps = '';
-            steps += `<div class="step">📍 <strong>起点：</strong>${startRoom.floor}F ${startRoomData.name}</div>`;
-            if (startRoom.floor !== endRoom.floor) {
-                steps += `<div class="step">🛗 <strong>乘坐电梯</strong> 从 ${startRoom.floor}F → ${endRoom.floor}F</div>`;
-            }
-            steps += `<div class="step">🏁 <strong>终点：</strong>${endRoom.floor}F ${endRoomData.name}</div>`;
+            const startName = hospitalData.floors[startRoom.floor].rooms.find(r=>r.id===startRoom.id)?.name;
+            const endName = hospitalData.floors[endRoom.floor].rooms.find(r=>r.id===endRoom.id)?.name;
 
-            let totalDistance = 0;
-            for (let i = 1; i < navigationPath.length; i++) {
+            let steps = `<div class="step">📍 起点：${startRoom.floor}F ${startName}</div>`;
+            if (startRoom.floor !== endRoom.floor) steps += `<div class="step">🛗 乘电梯 ${startRoom.floor}F → ${endRoom.floor}F</div>`;
+            steps += `<div class="step">🏁 终点：${endRoom.floor}F ${endName}</div>`;
+
+            let dist = 0;
+            for (let i=1; i<navigationPath.length; i++) {
                 const dx = navigationPath[i].x - navigationPath[i-1].x;
                 const dy = navigationPath[i].y - navigationPath[i-1].y;
-                totalDistance += Math.sqrt(dx*dx + dy*dy);
+                dist += Math.sqrt(dx*dx+dy*dy);
             }
-            const realDistance = Math.round(totalDistance * 0.5);
-            const walkTime = Math.ceil(realDistance / 60);
-            steps += `<div class="step" style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1);">`;
-            steps += `📏 预估距离：<span class="distance-badge">${realDistance} 米</span> `;
-            steps += `⏱️ 步行时间：约 ${walkTime} 分钟`;
+            const realDist = Math.round(dist * 0.5);
+            const time = Math.ceil(realDist / 60);
+            steps += `<div class="step" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);">`;
+            steps += `📏 约 <span class="distance-badge">${realDist} 米</span> ⏱️ 步行约 ${time} 分钟`;
             steps += `</div>`;
 
-            routeSteps.innerHTML = steps;
-            routeInfo.classList.add('show');
+            stepsDiv.innerHTML = steps;
+            info.classList.add('show');
 
-            // 生成语音播报文本
-            let speechText = `从${startRoom.floor}楼${startRoomData.name}出发，`;
-            if (startRoom.floor !== endRoom.floor) {
-                speechText += `乘坐电梯到${endRoom.floor}楼，`;
-            }
-            speechText += `前往${endRoomData.name}。全程约${realDistance}米，步行大约需要${walkTime}分钟。`;
-            if (realDistance > 100) speechText += '路程稍远，请注意安全。';
-            routeDescription = speechText;
+            // 生成语音文本
+            let speech = `从${startRoom.floor}楼${startName}出发，`;
+            if (startRoom.floor !== endRoom.floor) speech += `坐电梯到${endRoom.floor}楼，`;
+            speech += `前往${endName}。全程大约${realDist}米，步行需要${time}分钟。`;
+            routeDescription = speech;
         }
 
         function clearNavigation() {
-            startRoom = null;
-            endRoom = null;
+            startRoom = endRoom = null;
             navigationPath = [];
             document.getElementById('startPoint').value = '';
             document.getElementById('endPoint').value = '';
@@ -936,49 +705,33 @@
             renderMap(currentFloor);
         }
 
-        // ==================== 语音播报（保留原有功能并适配新页面） ====================
         function speakNavigation() {
-            if (!routeDescription) {
-                alert('请先规划一条路线');
-                return;
-            }
+            if (!routeDescription) { alert('请先规划一条路线'); return; }
             if ('speechSynthesis' in window) {
-                // 取消之前的播报
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(routeDescription);
-                utterance.lang = 'zh-CN';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-                window.speechSynthesis.speak(utterance);
-                // 震动反馈
+                const u = new SpeechSynthesisUtterance(routeDescription);
+                u.lang = 'zh-CN'; u.rate = 0.9; u.pitch = 1.0;
+                window.speechSynthesis.speak(u);
                 if (navigator.vibrate) navigator.vibrate(50);
-            } else {
-                alert('您的浏览器不支持语音播报');
-            }
+            } else alert('您的浏览器不支持语音');
         }
 
-        // 选择器监听
         document.getElementById('startPoint').addEventListener('change', function() {
             if (this.value) {
-                const [floor, id] = this.value.split('-');
-                startRoom = { floor: parseInt(floor), id };
+                const [f, id] = this.value.split('-');
+                startRoom = { floor: +f, id };
                 renderMap(currentFloor);
-                if (endRoom && startRoom && startRoom.floor !== endRoom.floor) {
-                    // 如果终点已选，可能需重新规划
-                }
             }
         });
         document.getElementById('endPoint').addEventListener('change', function() {
             if (this.value) {
-                const [floor, id] = this.value.split('-');
-                endRoom = { floor: parseInt(floor), id };
+                const [f, id] = this.value.split('-');
+                endRoom = { floor: +f, id };
                 renderMap(currentFloor);
             }
         });
 
-        // 初始化
         init();
     </script>
 </body>
 </html>
-                                                                                                                                                                                                                                               

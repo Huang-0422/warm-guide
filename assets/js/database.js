@@ -22,21 +22,29 @@ async function saveVisitToCloud(dept, date, doctor, diagnosis) {
         .from('visits')
         .insert([
             { 
-                user_phone: currentUser,
                 dept: dept,
                 visit_date: date,
                 doctor: doctor,
                 diagnosis: diagnosis
             }
-        ])
-        .select();
-    
-    if (error) {
-        console.error('保存失败:', error);
-        return null;
+        ]);
+        return {data,error};
     }
-    return data;
-}
+    async function loadVisitToCloud(dept,date,doctor,diagnosis){
+        const {date,error} = await supabase
+        .from('visits')
+        .insert([
+            {
+                dept:dept,
+                visit_date:date,
+                doctor:doctor,
+                diagnosis:disgnosis
+            }
+        ])
+    }    
+        // .select();
+    
+
 
 // 从云端获取就诊记录
 async function getVisitsFromCloud() {

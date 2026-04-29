@@ -94,193 +94,175 @@
         </div>
     </footer>
     <script>
-// ============================================
-// 动态天气健康提醒模块
-// ============================================
-
-// 1. 配置百度 API 密钥 (替换为你的百度AK)
-const BAIDU_API_KEY = '4t6MPoNmf3r9je8ceXCIoSnbn4c7XR6D';
-
-// 2. 默认城市编码 (110000 为北京，百度行政编码与高德通用)
-const DEFAULT_CITY_CODE = '110000';
-
-// 3. 获取页面元素
-const healthTipElement = document.getElementById('healthTip');
-
-// 4. 核心函数：获取天气并更新提醒
-async function fetchWeatherAndUpdateTip() {
-    if (!healthTipElement) return;
+    // ============================================
+    // 动态天气健康提醒模块
+    // ============================================
     
-    try {
-        // 尝试获取用户地理位置
-        const position = await getUserLocation();
-        const { longitude, latitude } = position.coords;
+    // 1. 配置高德 API 密钥 (请替换为你申请的真实 Key)
+    const GAODE_API_KEY = 'YOUR_GAODE_KEY';
+    
+    // 2. 默认城市编码 (110000 为北京，可按需修改)
+    const DEFAULT_CITY_CODE = '110000';
+    
+    // 3. 获取页面元素
+    const healthTipElement = document.getElementById('healthTip');
+    
+    // 4. 核心函数：获取天气并更新提醒
+    async function fetchWeatherAndUpdateTip() {
+        if (!healthTipElement) return;
         
-        // 根据经纬度获取城市编码（百度逆地理编码）
-        const cityCode = await getCityCodeByLocation(longitude, latitude);
-        
-        // 获取天气并生成提醒
-        await updateWeatherTip(cityCode);
-        
-    } catch (error) {
-        console.warn('定位或天气获取失败，使用默认城市:', error);
-        // 定位失败，降级使用默认城市
-        await updateWeatherTip(DEFAULT_CITY_CODE);
-    }
-}
-
-// 5. 获取用户地理位置 (返回 Promise)
-function getUserLocation() {
-    return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject(new Error('浏览器不支持定位'));
-            return;
+        try {
+            // 尝试获取用户地理位置
+            const position = await getUserLocation();
+            const { longitude, latitude } = position.coords;
+            
+            // 根据经纬度获取城市编码
+            const cityCode = await getCityCodeByLocation(longitude, latitude);
+            
+            // 获取天气并生成提醒
+            await updateWeatherTip(cityCode);
+            
+        } catch (error) {
+            console.warn('定位或天气获取失败，使用默认城市:', error);
+            // 定位失败，降级使用默认城市
+            await updateWeatherTip(DEFAULT_CITY_CODE);
         }
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-            timeout: 5000,
-            maximumAge: 600000 // 缓存10分钟
-        });
-    });
-}
-
-// 6. 根据经纬度获取城市编码（百度逆地理编码接口）
-async function getCityCodeByLocation(lng, lat) {
-    // 百度逆地理编码接口：lat(纬度)在前，lng(经度)在后
-    const url = `https://api.map.baidu.com/reverse_geocoding/v3/?ak=${BAIDU_API_KEY}&location=${lat},${lng}&output=json&coordtype=wgs84ll`;
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    // 百度接口返回 status=0 代表成功
-    if (data.status === 0 && data.result && data.result.addressComponent) {
-        // 返回百度行政编码（与高德adcode通用）
-        return data.result.addressComponent.adcode;
-    } else {
-        throw new Error(`地理编码失败：${data.message || '未知错误'}`);
     }
-}
-
-// 7. 获取天气并生成健康提醒（百度天气API）
-async function updateWeatherTip(cityCode) {
-    try {
-        // 百度天气接口：district_id=城市编码，data_type=all返回完整数据
-        const weatherUrl = `https://api.map.baidu.com/weather/v1/?district_id=${cityCode}&data_type=all&ak=${BAIDU_API_KEY}`;
-        const response = await fetch(weatherUrl);
+    
+    // 5. 获取用户地理位置 (返回 Promise)
+    function getUserLocation() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error('浏览器不支持定位'));
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 5000,
+                maximumAge: 600000 // 缓存10分钟
+            });
+        });
+    }
+    
+    // 6. 根据经纬度获取城市编码
+    async function getCityCodeByLocation(lng, lat) {
+        const url = `https://restapi.amap.com/v3/geocode/regeo?key=${GAODE_API_KEY}&location=${lng},${lat}`;
+        const response = await fetch(url);
         const data = await response.json();
         
-        // 百度天气接口 status=0 代表成功
-        if (data.status !== 0 || !data.result || !data.result.now) {
-            throw new Error('天气数据获取失败');
+        if (data.status === '1' && data.regeocode) {
+            return data.regeocode.addressComponent.adcode;
+        } else {
+            throw new Error('地理编码失败');
+        }
+    }
+    
+    // 7. 获取天气并生成健康提醒
+    async function updateWeatherTip(cityCode) {
+        try {
+            // 获取实时天气
+            const weatherUrl = `https://restapi.amap.com/v3/weather/weatherInfo?key=${GAODE_API_KEY}&city=${cityCode}&extensions=base`;
+            const response = await fetch(weatherUrl);
+            const data = await response.json();
+            
+            if (data.status !== '1' || !data.lives || data.lives.length === 0) {
+                throw new Error('天气数据获取失败');
+            }
+            
+            const weather = data.lives[0];
+            const { temperature, weather: condition, humidity, windpower, province, city } = weather;
+            
+            // 生成智能健康提醒
+            const healthAdvice = generateHealthAdvice({
+                temp: parseInt(temperature),
+                condition,
+                humidity: parseInt(humidity),
+                windpower: parseInt(windpower)
+            });
+            
+            // 更新页面显示
+            const locationName = city || province || '本地';
+            healthTipElement.textContent = `${locationName} ${temperature}℃ ${condition}，${healthAdvice}`;
+            
+            // 根据天气类型添加相应图标
+            updateWeatherIcon(condition);
+            
+        } catch (error) {
+            console.error('天气更新失败:', error);
+            healthTipElement.textContent = '天气转凉，就诊记得带件外套';
+        }
+    }
+    
+    // 8. 智能健康建议生成器 (气象+医疗逻辑)
+    function generateHealthAdvice(weather) {
+        const { temp, condition, humidity, windpower } = weather;
+        let advice = '';
+        
+        // 基于温度的建议
+        if (temp <= 5) {
+            advice = '天气寒冷，心血管患者注意头部保暖，避免清晨外出';
+        } else if (temp > 5 && temp <= 12) {
+            advice = '气温较低，注意添衣保暖，预防感冒';
+        } else if (temp > 12 && temp <= 22) {
+            advice = '温度舒适，适合户外活动，建议散步30分钟';
+        } else if (temp > 22 && temp <= 30) {
+            advice = '天气温暖，就诊时注意防晒补水';
+        } else if (temp > 30) {
+            advice = '天气炎热，就诊带好水和伞，避免中暑';
         }
         
-        // 解析百度天气数据（适配原有变量名）
-        const nowWeather = data.result.now; // 实时天气
-        const todayForecast = data.result.forecasts[0]; // 当日预报
-        const province = data.result.location.province;
-        const city = data.result.location.city;
-        const district = data.result.location.district;
+        // 基于天气现象的建议 (优先级更高，会覆盖温度建议)
+        const lowerCondition = condition.toLowerCase();
+        if (lowerCondition.includes('雨')) {
+            advice = '雨天路滑，就诊小心慢行，建议携带雨具';
+        } else if (lowerCondition.includes('雪')) {
+            advice = '雪天寒冷，心血管患者注意头部保暖，减少外出';
+        } else if (lowerCondition.includes('雾') || lowerCondition.includes('霾')) {
+            advice = '空气质量不佳，外出请佩戴口罩';
+        } else if (lowerCondition.includes('大风') || windpower >= 5) {
+            advice = '风力较大，注意防风，避免在高楼旁行走';
+        } else if (lowerCondition.includes('阴')) {
+            if (!advice) advice = '天气阴凉，关节不好的老人注意保暖';
+        } else if (lowerCondition.includes('晴')) {
+            if (temp > 15) advice = '天气晴好，适合开窗通风';
+        }
         
-        // 映射百度字段到原有变量名，保证业务逻辑不改动
-        const weather = {
-            temperature: nowWeather.temp, // 实时温度
-            weather: todayForecast.text_day, // 日间天气状况（晴/雨/多云等）
-            humidity: nowWeather.humidity, // 湿度
-            windpower: todayForecast.wind_class, // 风力等级
-            province,
-            city
-        };
+        // 湿度特别提醒
+        if (humidity > 80 && !advice.includes('雨')) {
+            advice += '，空气潮湿，风湿患者注意关节保暖';
+        }
         
-        // 生成智能健康提醒（复用原有逻辑）
-        const healthAdvice = generateHealthAdvice({
-            temp: parseInt(weather.temperature),
-            condition: weather.weather,
-            humidity: parseInt(weather.humidity),
-            windpower: parseInt(weather.windpower) || 0 // 兼容无风力值的情况
-        });
-        
-        // 更新页面显示（复用原有逻辑）
-        const locationName = district || city || province || '本地';
-        healthTipElement.textContent = `${locationName} ${weather.temperature}℃ ${weather.weather}，${healthAdvice}`;
-        
-        // 根据天气类型添加相应图标（复用原有逻辑）
-        updateWeatherIcon(weather.weather);
-        
-    } catch (error) {
-        console.error('天气更新失败:', error);
-        healthTipElement.textContent = '天气转凉，就诊记得带件外套';
-    }
-}
-
-// 8. 智能健康建议生成器 (完全复用原有逻辑，无需修改)
-function generateHealthAdvice(weather) {
-    const { temp, condition, humidity, windpower } = weather;
-    let advice = '';
-    
-    // 基于温度的建议
-    if (temp <= 5) {
-        advice = '天气寒冷，心血管患者注意头部保暖，避免清晨外出';
-    } else if (temp > 5 && temp <= 12) {
-        advice = '气温较低，注意添衣保暖，预防感冒';
-    } else if (temp > 12 && temp <= 22) {
-        advice = '温度舒适，适合户外活动，建议散步30分钟';
-    } else if (temp > 22 && temp <= 30) {
-        advice = '天气温暖，就诊时注意防晒补水';
-    } else if (temp > 30) {
-        advice = '天气炎热，就诊带好水和伞，避免中暑';
+        return advice || '祝您就诊顺利，身体健康';
     }
     
-    // 基于天气现象的建议 (优先级更高，会覆盖温度建议)
-    const lowerCondition = condition.toLowerCase();
-    if (lowerCondition.includes('雨')) {
-        advice = '雨天路滑，就诊小心慢行，建议携带雨具';
-    } else if (lowerCondition.includes('雪')) {
-        advice = '雪天寒冷，心血管患者注意头部保暖，减少外出';
-    } else if (lowerCondition.includes('雾') || lowerCondition.includes('霾')) {
-        advice = '空气质量不佳，外出请佩戴口罩';
-    } else if (lowerCondition.includes('大风') || windpower >= 5) {
-        advice = '风力较大，注意防风，避免在高楼旁行走';
-    } else if (lowerCondition.includes('阴')) {
-        if (!advice) advice = '天气阴凉，关节不好的老人注意保暖';
-    } else if (lowerCondition.includes('晴')) {
-        if (temp > 15) advice = '天气晴好，适合开窗通风';
+    // 9. 更新天气图标 (适老化视觉提示)
+    function updateWeatherIcon(condition) {
+        const iconSpan = document.querySelector('.weather-tip span:first-child');
+        if (!iconSpan) return;
+        
+        const lowerCond = condition.toLowerCase();
+        if (lowerCond.includes('雨')) {
+            iconSpan.textContent = '🌧️';
+        } else if (lowerCond.includes('雪')) {
+            iconSpan.textContent = '❄️';
+        } else if (lowerCond.includes('晴')) {
+            iconSpan.textContent = '☀️';
+        } else if (lowerCond.includes('云') || lowerCond.includes('阴')) {
+            iconSpan.textContent = '☁️';
+        } else if (lowerCond.includes('雾') || lowerCond.includes('霾')) {
+            iconSpan.textContent = '🌫️';
+        } else {
+            iconSpan.textContent = '🌡️';
+        }
     }
     
-    // 湿度特别提醒
-    if (humidity > 80 && !advice.includes('雨')) {
-        advice += '，空气潮湿，风湿患者注意关节保暖';
-    }
-    
-    return advice || '祝您就诊顺利，身体健康';
-}
-
-// 9. 更新天气图标 (完全复用原有逻辑，无需修改)
-function updateWeatherIcon(condition) {
-    const iconSpan = document.querySelector('.weather-tip span:first-child');
-    if (!iconSpan) return;
-    
-    const lowerCond = condition.toLowerCase();
-    if (lowerCond.includes('雨')) {
-        iconSpan.textContent = '🌧️';
-    } else if (lowerCond.includes('雪')) {
-        iconSpan.textContent = '❄️';
-    } else if (lowerCond.includes('晴')) {
-        iconSpan.textContent = '☀️';
-    } else if (lowerCond.includes('云') || lowerCond.includes('阴')) {
-        iconSpan.textContent = '☁️';
-    } else if (lowerCond.includes('雾') || lowerCond.includes('霾')) {
-        iconSpan.textContent = '🌫️';
-    } else {
-        iconSpan.textContent = '🌡️';
-    }
-}
-
-// 10. 页面加载时执行 (保留原有逻辑)
-window.addEventListener('DOMContentLoaded', () => {
-    // 优先执行天气动态提醒
-    fetchWeatherAndUpdateTip();
-    
-    // 原有的 updateGreeting 和 setInterval 保留在 app.js 中，不受影响
-});
-    
+    // 10. 页面加载时执行 (覆盖原有的 setHealthTip)
+    window.addEventListener('DOMContentLoaded', () => {
+        // 优先执行天气动态提醒
+        fetchWeatherAndUpdateTip();
+        
+        // 原有的 updateGreeting 和 setInterval 保留在 app.js 中，不受影响
+    });
+  
 </script>
 
     <script src="assets/js/app.js"></script>

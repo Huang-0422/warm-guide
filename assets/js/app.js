@@ -55,14 +55,23 @@ function setHealthTip() {
 }
 
 // 4. 导航函数 - 跳转到导诊页面
+// 4. 导航函数 - 跳转到对应页面
 function navigateTo(page) {
-    if (page === 'guide') {
-        window.location.href = 'pages/guide.html';
+    // 所有页面的跳转规则
+    const pageMap = {
+        'guide': 'pages/guide.html',       // 就医指南
+        'navigation': 'pages/navigation.html', // 院内导航
+        'records': 'pages/records.html',   // 就诊记录
+        'process': 'pages/process.html'   // 就医流程
+    };
+
+    // 检查是否存在这个页面
+    if (pageMap[page]) {
+        window.location.href = pageMap[page];
     } else {
-        showLargeAlert('📋 功能开发中', '该功能将在完整版中呈现\n感谢您的关注');
+        showLargeAlert('⚠️ 页面不存在', '该功能暂未上线，敬请期待');
     }
 }
-
 // 5. 紧急呼叫功能 - 跳转到紧急联系人页面
 function triggerEmergency() {
     window.location.href = 'pages/emergency.html';

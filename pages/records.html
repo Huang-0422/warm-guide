@@ -588,5 +588,18 @@
             setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 2000);
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/database.js"></script>
+    <!-- 先配置 -->
+<script src="api/config.js"></script>
+<!-- 类型设为 module -->
+<script type="module">
+import { getAllData, addData } from './api/db.js';
+
+// 示例：读取科室表数据
+getAllData("department").then(res=>{
+  console.log("科室数据：",res);
+})
+</script>
 </body>
 </html>
